@@ -34,10 +34,11 @@ contexta/
 
 ## Prerequisites
 
-- Python 3.11+
+- Python 3.12+
 - Poetry (for dependency management)
 - Qdrant (vector database) - running on localhost:6333 by default
 - OpenAI API key
+- Docker & Docker Compose (optional, para rodar com containers)
 
 ## Installation
 
@@ -215,25 +216,145 @@ This project follows:
 - **Error Handling**: Comprehensive logging and error handling throughout
 - **Type Safety**: Type hints required for all functions
 
+## Testes
+
+Contexta possui uma suíte completa de testes unitários e de integração.
+
+### Executar Testes
+
+```bash
+# Todos os testes
+./run_tests.sh
+
+# Testes com cobertura
+./run_tests.sh cov
+
+# Apenas testes unitários
+./run_tests.sh unit
+
+# Testes rápidos (exclui testes lentos)
+./run_tests.sh fast
+```
+
+### Usando Poetry diretamente
+
+```bash
+# Todos os testes
+poetry run pytest
+
+# Com cobertura
+poetry run pytest --cov
+
+# Testes específicos
+poetry run pytest tests/test_core/
+poetry run pytest tests/test_core/test_llm.py::TestOpenAILLM::test_generate
+```
+
+### Estrutura de Testes
+
+```
+tests/
+├── conftest.py              # Fixtures compartilhadas
+├── test_core/              # Testes do core
+│   ├── test_llm.py         # Testes de LLM providers
+│   ├── test_prompts.py     # Testes de prompt builders
+│   └── test_reranker.py    # Testes de re-rankers
+├── test_ingest/            # Testes do ingest
+│   ├── test_chunking.py    # Testes de chunking
+│   ├── test_loaders.py     # Testes de loaders
+│   ├── test_embeddings.py  # Testes de embeddings
+│   └── test_vectorstore.py # Testes de vector store
+└── test_api/               # Testes da API
+    └── test_main.py        # Testes de endpoints
+```
+
+### Coverage
+
+```bash
+# Gerar relatório HTML
+poetry run pytest --cov --cov-report=html
+
+# Abrir no navegador
+open htmlcov/index.html
+```
+
+### Testes no Docker
+
+```bash
+# Executar testes no container
+docker-compose run --rm ingest poetry run pytest
+
+# Com cobertura
+docker-compose run --rm ingest poetry run pytest --cov
+```
+
+### CI/CD
+
+Os testes são executados automaticamente no GitHub Actions a cada push ou pull request.
+Veja `.github/workflows/tests.yml` para mais detalhes.
+
+Para mais informações sobre testes, veja [README_TESTS.md](README_TESTS.md).
+
 ## Troubleshooting
 
 ### Qdrant Connection Issues
 
 - Verify Qdrant is running: `curl http://localhost:6333/health`
 - Check `QDRANT_URL` in `.env`
+- Se usando Docker: `docker-compose ps` para ver status dos containers
 
 ### OpenAI API Issues
 
 - Verify `OPENAI_API_KEY` is set in `.env`
 - Check API key validity and quota
+- Test API key: `curl https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY"`
 
 ### Document Ingestion Fails
 
-- Check ingest service logs
+- Check ingest service logs: `docker-compose logs ingest`
 - Verify file path is accessible
 - Check document format is supported (PDF, TXT)
+- Verify tenant_id is correct
+
+### Import Errors nos Testes
+
+```bash
+# Adicionar ao PYTHONPATH
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+poetry run pytest
+```
+
+### Dependências Desatualizadas
+
+```bash
+# Atualizar poetry.lock
+poetry lock
+
+# Reinstalar dependências
+poetry install --no-root
+```
+
+## Docker
+
+Para instruções detalhadas sobre Docker, veja [DOCKER_README.md](DOCKER_README.md).
+
+### Quick Start com Docker
+
+```bash
+# Subir todos os serviços
+make up
+
+# Ver logs
+make logs
+
+# Executar testes
+make docker-test
+
+# Parar serviços
+make down
+```
 
 ## License
 
-[Add your license here]
+MIT License
 

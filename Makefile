@@ -1,77 +1,74 @@
-# Makefile para facilitar comandos Docker
-
-.PHONY: help build up down logs shell migrate createsuperuser clean restart
+.PHONY: help test test-cov test-unit test-integration test-watch clean install lint format
 
 help:
 	@echo "Comandos disponíveis:"
-	@echo "  make build          - Reconstrói as imagens Docker"
-	@echo "  make up             - Inicia todos os serviços"
-	@echo "  make down           - Para todos os serviços"
-	@echo "  make logs           - Mostra logs de todos os serviços"
-	@echo "  make shell          - Abre shell no container Django"
-	@echo "  make migrate        - Executa migrações do Django"
-	@echo "  make createsuperuser - Cria superusuário do Django"
-	@echo "  make clean          - Remove containers e volumes"
-	@echo "  make restart        - Reinicia todos os serviços"
-	@echo "  make test           - Executa testes"
+	@echo "  make install       - Instalar dependências"
+	@echo "  make test          - Executar todos os testes"
+	@echo "  make test-cov      - Executar testes com cobertura"
+	@echo "  make test-unit     - Executar apenas testes unitários"
+	@echo "  make test-integration - Executar apenas testes de integração"
+	@echo "  make test-watch    - Executar testes em modo watch"
+	@echo "  make lint          - Executar linter"
+	@echo "  make format        - Formatar código"
+	@echo "  make clean         - Limpar arquivos temporários"
+	@echo ""
+	@echo "Docker:"
+	@echo "  make docker-up     - Subir serviços Docker"
+	@echo "  make docker-down   - Parar serviços Docker"
+	@echo "  make docker-test   - Executar testes no Docker"
+	@echo "  make docker-logs   - Ver logs dos containers"
 
-build:
-	docker-compose build
-
-up:
-	docker-compose up -d
-	@echo "Serviços iniciados!"
-	@echo "Django Admin: http://localhost:8000/admin"
-	@echo "Query API: http://localhost:8002"
-	@echo "Ingest Service: http://localhost:8001"
-	@echo "Qdrant: http://localhost:6333/dashboard"
-
-down:
-	docker-compose down
-
-logs:
-	docker-compose logs -f
-
-shell:
-	docker-compose exec django python web/manage.py shell
-
-migrate:
-	docker-compose exec django python web/manage.py migrate
-
-makemigrations:
-	docker-compose exec django python web/manage.py makemigrations
-
-createsuperuser:
-	docker-compose exec django python web/manage.py createsuperuser
-
-clean:
-	docker-compose down -v
-	@echo "Todos os containers e volumes foram removidos"
-
-restart:
-	docker-compose restart
+install:
+	pip install -r requirements.txt
 
 test:
-	docker-compose exec django python web/manage.py test
+	pytest
 
-# Comandos de desenvolvimento
-dev-django:
-	docker-compose logs -f django
+test-cov:
+	pytest --cov --cov-report=term-missing --cov-report=html
 
-dev-ingest:
-	docker-compose logs -f ingest
+test-unit:
+	pytest -m unit
 
-dev-api:
-	docker-compose logs -f api
+test-integration:
+	pytest -m integration
 
-# Health checks
-health:
-	@echo "Verificando Qdrant..."
-	@curl -s http://localhost:6333/health || echo "❌ Qdrant offline"
-	@echo "\nVerificando Ingest Service..."
-	@curl -s http://localhost:8001/health || echo "❌ Ingest offline"
-	@echo "\nVerificando Query API..."
-	@curl -s http://localhost:8002/health || echo "❌ API offline"
-	@echo "\nVerificando Django..."
-	@curl -s http://localhost:8000/admin/ > /dev/null && echo "✅ Django online" || echo "❌ Django offline"
+test-watch:
+	pytest-watch
 
+lint:
+	flake8 core/ ingest/ api/ web/ --max-line-length=120
+
+format:
+	black core/ ingest/ api/ web/
+	isort core/ ingest/ api/ web/
+
+clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete
+	rm -rf htmlcov/
+	rm -rf .coverage
+	rm -rf dist/
+	rm -rf build/
+
+# Docker commands
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down
+
+docker-test:
+	docker-compose run --rm ingest pytest
+
+docker-logs:
+	docker-compose logs -f
+
+docker-restart:
+	docker-compose restart
+
+docker-clean:
+	docker-compose down -v
+	docker system prune -f

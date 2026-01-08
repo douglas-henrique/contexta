@@ -82,15 +82,25 @@ async def query_documents(request: QueryRequest):
                 tenant_id=request.tenant_id
             )
         
-        logger.debug(f"Found {len(search_results)} search results")
-        
-        # 3. Re-rank results
-        logger.debug(f"Re-ranking results (top_k={request.rerank_top_k})")
-        reranked_results = reranker.rerank(
-            query=request.query,
-            results=search_results,
-            top_k=request.rerank_top_k
-        )
+            logger.debug(f"Found {len(search_results)} search results")
+
+            # Check if we have any results
+            if not search_results:
+                logger.info(f"No results found for tenant {request.tenant_id} query: {request.query}")
+                return QueryResponse(
+                    answer="I couldn't find any relevant information in the documents to answer your question. Please try rephrasing your query or check if documents have been uploaded.",
+                    sources=[],
+                    query=request.query,
+                    tenant_id=request.tenant_id
+                )
+
+            # 3. Re-rank results
+            logger.debug(f"Re-ranking results (top_k={request.rerank_top_k})")
+            reranked_results = reranker.rerank(
+                query=request.query,
+                results=search_results,
+                top_k=request.rerank_top_k
+            )
         
         logger.debug(f"Selected {len(reranked_results)} results after re-ranking")
         
