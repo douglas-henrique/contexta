@@ -2,6 +2,8 @@
 
 Production-grade RAG (Retrieval-Augmented Generation) SaaS application.
 
+> 📚 **Documentação Completa**: Veja [project_docs/](project_docs/) para guias detalhados de Docker, testes, arquitetura e mais.
+
 ## Architecture
 
 Contexta follows a clean architecture with strict separation of concerns:
@@ -220,7 +222,7 @@ This project follows:
 
 Contexta possui uma suíte completa de testes unitários e de integração.
 
-### Executar Testes
+### Quick Start
 
 ```bash
 # Todos os testes
@@ -231,69 +233,13 @@ Contexta possui uma suíte completa de testes unitários e de integração.
 
 # Apenas testes unitários
 ./run_tests.sh unit
-
-# Testes rápidos (exclui testes lentos)
-./run_tests.sh fast
 ```
 
-### Usando Poetry diretamente
+### Documentação Completa de Testes
 
-```bash
-# Todos os testes
-poetry run pytest
+📚 **[Guia Visual de Testes](project_docs/TESTING_GUIDE.md)** - Guia completo com estrutura, boas práticas, CI/CD e troubleshooting
 
-# Com cobertura
-poetry run pytest --cov
-
-# Testes específicos
-poetry run pytest tests/test_core/
-poetry run pytest tests/test_core/test_llm.py::TestOpenAILLM::test_generate
-```
-
-### Estrutura de Testes
-
-```
-tests/
-├── conftest.py              # Fixtures compartilhadas
-├── test_core/              # Testes do core
-│   ├── test_llm.py         # Testes de LLM providers
-│   ├── test_prompts.py     # Testes de prompt builders
-│   └── test_reranker.py    # Testes de re-rankers
-├── test_ingest/            # Testes do ingest
-│   ├── test_chunking.py    # Testes de chunking
-│   ├── test_loaders.py     # Testes de loaders
-│   ├── test_embeddings.py  # Testes de embeddings
-│   └── test_vectorstore.py # Testes de vector store
-└── test_api/               # Testes da API
-    └── test_main.py        # Testes de endpoints
-```
-
-### Coverage
-
-```bash
-# Gerar relatório HTML
-poetry run pytest --cov --cov-report=html
-
-# Abrir no navegador
-open htmlcov/index.html
-```
-
-### Testes no Docker
-
-```bash
-# Executar testes no container
-docker-compose run --rm ingest poetry run pytest
-
-# Com cobertura
-docker-compose run --rm ingest poetry run pytest --cov
-```
-
-### CI/CD
-
-Os testes são executados automaticamente no GitHub Actions a cada push ou pull request.
-Veja `.github/workflows/tests.yml` para mais detalhes.
-
-Para mais informações sobre testes, veja [README_TESTS.md](README_TESTS.md).
+📖 **[Documentação Detalhada](project_docs/README_TESTS.md)** - Fixtures, exemplos, configuração e integração
 
 ## Troubleshooting
 
@@ -336,8 +282,6 @@ poetry install --no-root
 
 ## Docker
 
-Para instruções detalhadas sobre Docker, veja [DOCKER_README.md](DOCKER_README.md).
-
 ### Quick Start com Docker
 
 ```bash
@@ -353,6 +297,8 @@ make docker-test
 # Parar serviços
 make down
 ```
+
+📚 **[Documentação Completa de Docker](project_docs/DOCKER_README.md)** - Guia detalhado de setup, troubleshooting e comandos Docker
 
 ## License
 
