@@ -16,7 +16,17 @@ from ..config import OPENAI_EMBEDDING_MODEL, QDRANT_COLLECTION, QDRANT_URL
 
 logger = logging.getLogger(__name__)
 
-client = QdrantClient(url=QDRANT_URL)
+# Lazy initialization - client is created only when needed
+_client = None
+
+
+def _get_client() -> QdrantClient:
+    """Get or create Qdrant client with lazy initialization."""
+    global _client
+    if _client is None:
+        _client = QdrantClient(url=QDRANT_URL)
+    return _client
+
 
 COLLECTION = QDRANT_COLLECTION
 
@@ -31,6 +41,7 @@ EMBEDDING_DIMENSIONS = {
 def _ensure_collection_exists():
     """Ensure the collection exists with correct configuration."""
     try:
+        client = _get_client()
         collection_list = client.get_collections().collections
         collection_names = [c.name for c in collection_list]
 
@@ -89,6 +100,7 @@ def store_embeddings(
         )
 
     try:
+        client = _get_client()
         client.upsert(collection_name=COLLECTION, points=points)
         logger.info(f"Stored {len(points)} chunks for document {document_id} (tenant {tenant_id})")
     except Exception as e:
@@ -127,6 +139,7 @@ def search(
     query_filter = Filter(must=conditions) if conditions else None
 
     try:
+        client = _get_client()
         results = client.search(
             collection_name=COLLECTION,
             query_vector=query_embedding,
