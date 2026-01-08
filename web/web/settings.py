@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     # Local apps
-    "authentication",
+    "authentication.apps.AuthenticationConfig",
     "documents",
 ]
 
