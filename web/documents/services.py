@@ -31,9 +31,7 @@ def trigger_ingestion(
     Returns:
         True if ingestion was triggered successfully, False otherwise
     """
-    ingest_service_url = getattr(
-        settings, "INGEST_SERVICE_URL", "http://localhost:8001"
-    )
+    ingest_service_url = getattr(settings, "INGEST_SERVICE_URL", "http://localhost:8001")
     url = f"{ingest_service_url}/ingest"
 
     payload = {
@@ -47,9 +45,7 @@ def trigger_ingestion(
         payload["callback_url"] = callback_url
 
     try:
-        logger.info(
-            f"Triggering ingestion for document {document_id} (tenant {user_id})"
-        )
+        logger.info(f"Triggering ingestion for document {document_id} (tenant {user_id})")
 
         with httpx.Client(timeout=10.0) as client:
             response = client.post(url, json=payload)
@@ -57,9 +53,7 @@ def trigger_ingestion(
 
             result = response.json()
             if result.get("status") == "accepted":
-                logger.info(
-                    f"Ingestion triggered successfully for document {document_id}"
-                )
+                logger.info(f"Ingestion triggered successfully for document {document_id}")
                 return True
             else:
                 logger.warning(f"Unexpected response from ingest service: {result}")

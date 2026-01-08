@@ -33,9 +33,7 @@ class RAGPromptBuilder(PromptBuilder):
             question_prefix: Prefix for question section
             answer_prefix: Prefix for answer section
         """
-        self.system_instruction = (
-            system_instruction or self._default_system_instruction()
-        )
+        self.system_instruction = system_instruction or self._default_system_instruction()
         self.context_prefix = context_prefix
         self.question_prefix = question_prefix
         self.answer_prefix = answer_prefix

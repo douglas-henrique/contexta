@@ -12,9 +12,7 @@ class VectorStore(ABC):
     """Abstract base class for vector stores."""
 
     @abstractmethod
-    async def add_documents(
-        self, chunks: List[Chunk], embeddings: List[List[float]], tenant_id: str
-    ) -> None:
+    async def add_documents(self, chunks: List[Chunk], embeddings: List[List[float]], tenant_id: str) -> None:
         """
         Add documents to the vector store.
 

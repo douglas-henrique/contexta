@@ -10,9 +10,7 @@ class Reranker(ABC):
     """Abstract base class for re-ranking strategies."""
 
     @abstractmethod
-    def rerank(
-        self, query: str, results: List[Dict[str, Any]], top_k: int = 5
-    ) -> List[Dict[str, Any]]:
+    def rerank(self, query: str, results: List[Dict[str, Any]], top_k: int = 5) -> List[Dict[str, Any]]:
         """
         Re-rank search results based on query relevance.
 

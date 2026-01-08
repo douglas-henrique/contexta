@@ -45,11 +45,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     user_id=self.request.user.id,
                     metadata={
                         "title": document.title,
-                        "created_at": (
-                            document.created_at.isoformat()
-                            if document.created_at
-                            else None
-                        ),
+                        "created_at": (document.created_at.isoformat() if document.created_at else None),
                     },
                 )
 

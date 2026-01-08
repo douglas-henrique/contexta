@@ -33,9 +33,7 @@ def ingest(payload: IngestRequest, background_tasks: BackgroundTasks):
             payload.callback_url,
         )
 
-        logger.info(
-            f"Ingestion task queued for document {payload.document_id} (tenant {payload.tenant_id})"
-        )
+        logger.info(f"Ingestion task queued for document {payload.document_id} (tenant {payload.tenant_id})")
 
         return {
             "status": "accepted",

@@ -90,9 +90,7 @@ def store_embeddings(
 
     try:
         client.upsert(collection_name=COLLECTION, points=points)
-        logger.info(
-            f"Stored {len(points)} chunks for document {document_id} (tenant {tenant_id})"
-        )
+        logger.info(f"Stored {len(points)} chunks for document {document_id} (tenant {tenant_id})")
     except Exception as e:
         logger.error(f"Error storing embeddings: {e}")
         raise

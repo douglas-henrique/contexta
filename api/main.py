@@ -62,9 +62,7 @@ async def query_documents(request: QueryRequest):
     6. Return answer with sources
     """
     try:
-        logger.info(
-            f"Processing query for tenant {request.tenant_id}: {request.query[:50]}..."
-        )
+        logger.info(f"Processing query for tenant {request.tenant_id}: {request.query[:50]}...")
 
         # 1. Generate query embedding
         logger.debug("Generating query embedding")
@@ -91,9 +89,7 @@ async def query_documents(request: QueryRequest):
 
             # Check if we have any results
             if not search_results:
-                logger.info(
-                    f"No results found for tenant {request.tenant_id} query: {request.query}"
-                )
+                logger.info(f"No results found for tenant {request.tenant_id} query: {request.query}")
                 return QueryResponse(
                     answer=(
                         "I couldn't find any relevant information in the documents "
@@ -107,9 +103,7 @@ async def query_documents(request: QueryRequest):
 
             # 3. Re-rank results
             logger.debug(f"Re-ranking results (top_k={request.rerank_top_k})")
-            reranked_results = reranker.rerank(
-                query=request.query, results=search_results, top_k=request.rerank_top_k
-            )
+            reranked_results = reranker.rerank(query=request.query, results=search_results, top_k=request.rerank_top_k)
 
         logger.debug(f"Selected {len(reranked_results)} results after re-ranking")
 

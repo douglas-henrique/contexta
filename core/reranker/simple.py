@@ -15,9 +15,7 @@ class SimpleReranker(Reranker):
     more sophisticated re-ranking (CrossEncoder, LLM-based, etc.)
     """
 
-    def rerank(
-        self, query: str, results: List[Dict[str, Any]], top_k: int = 5
-    ) -> List[Dict[str, Any]]:
+    def rerank(self, query: str, results: List[Dict[str, Any]], top_k: int = 5) -> List[Dict[str, Any]]:
         """
         Re-rank results by score (descending).
 
@@ -30,8 +28,6 @@ class SimpleReranker(Reranker):
             Re-ranked list of results sorted by score
         """
         # Sort by score (descending) and return top_k
-        sorted_results = sorted(
-            results, key=lambda x: x.get("score", 0.0), reverse=True
-        )
+        sorted_results = sorted(results, key=lambda x: x.get("score", 0.0), reverse=True)
 
         return sorted_results[:top_k]

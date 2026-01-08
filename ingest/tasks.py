@@ -73,9 +73,7 @@ def ingest_document(
         callback_url: Optional URL to call when ingestion completes
     """
     try:
-        logger.info(
-            f"Starting ingestion for document {document_id} (tenant {tenant_id})"
-        )
+        logger.info(f"Starting ingestion for document {document_id} (tenant {tenant_id})")
 
         # 1. Detect and load document
         file_type = _detect_file_type(file_path)
@@ -111,9 +109,7 @@ def ingest_document(
             tenant_id=tenant_id,
         )
 
-        logger.info(
-            f"Document {document_id} ingested successfully (tenant {tenant_id})"
-        )
+        logger.info(f"Document {document_id} ingested successfully (tenant {tenant_id})")
 
         # 5. Callback if provided
         if callback_url:
