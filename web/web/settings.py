@@ -34,7 +34,10 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1,django,contexta-django",
+).split(",")
 
 
 # Application definition
@@ -152,10 +155,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media files (user uploads)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Contexta Configuration
 INGEST_SERVICE_URL = os.getenv("INGEST_SERVICE_URL", "http://localhost:8001")
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+DJANGO_BASE_URL = os.getenv("DJANGO_BASE_URL", "http://localhost:8000")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 # CORS Configuration

@@ -30,6 +30,7 @@ services:
       - DEBUG=${DEBUG:-True}
       - QDRANT_URL=http://qdrant:6333
       - INGEST_SERVICE_URL=http://ingest:8001
+      - DJANGO_BASE_URL=${DJANGO_BASE_URL:-http://django:8000}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       - qdrant
@@ -54,8 +55,10 @@ services:
       - QDRANT_COLLECTION=${QDRANT_COLLECTION:-contexta_documents}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_EMBEDDING_MODEL=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-large}
+      - DJANGO_BASE_URL=${DJANGO_BASE_URL:-http://django:8000}
     depends_on:
       - qdrant
+      - django
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s

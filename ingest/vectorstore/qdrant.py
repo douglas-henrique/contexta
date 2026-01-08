@@ -140,17 +140,23 @@ def search(
 
     try:
         client = _get_client()
-        results = client.search(
+        
+        # Use query_points - pass vector directly or use NamedVector
+        # For qdrant-client 1.7.0+, query can be a list of floats directly
+        query_result = client.query_points(
             collection_name=COLLECTION,
-            query_vector=query_embedding,
+            query=query_embedding,  # Pass vector directly
             query_filter=query_filter,
             limit=top_k,
         )
 
+        # Extract points from query result
+        results = query_result.points
+
         return [
             {
-                "id": result.id,
-                "score": result.score,
+                "id": str(result.id),
+                "score": float(result.score),
                 "payload": result.payload,
                 "text": result.payload.get("text", ""),
                 "document_id": result.payload.get("document_id"),

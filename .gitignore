@@ -45,6 +45,14 @@ db.sqlite3
 db.sqlite3-journal
 /static/
 /media/
+web/staticfiles/
+
+# Media files (user uploads) - ignore all files except .gitkeep
+web/media/**
+!web/media/
+!web/media/.gitkeep
+!web/media/documents/
+!web/media/documents/.gitkeep
 
 # FastAPI
 .pytest_cache/

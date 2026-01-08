@@ -264,6 +264,4 @@ make restart
 make clean
 ```
 
----
-
-**For more detailed information, see the main [README.md](../README.md)**
+---**For more detailed information, see the main [README.md](../README.md)**

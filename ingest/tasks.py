@@ -1,4 +1,5 @@
 import logging
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -113,33 +114,106 @@ def ingest_document(
 
         # 5. Callback if provided
         if callback_url:
-            try:
-                import httpx
-
-                httpx.post(
-                    callback_url,
-                    json={
-                        "document_id": document_id,
-                        "status": "completed",
-                        "chunks_created": len(chunks),
-                    },
-                    timeout=5.0,
-                )
-            except Exception as e:
-                logger.warning(f"Failed to send callback: {e}")
+            _send_callback_with_retry(
+                callback_url,
+                {
+                    "document_id": document_id,
+                    "status": "completed",
+                    "chunks_created": len(chunks),
+                },
+                document_id,
+            )
 
     except FileNotFoundError as e:
         logger.error(f"File not found for document {document_id}: {e}")
+        _send_failed_callback(callback_url, document_id)
         raise
     except ValueError as e:
         logger.error(f"Value error during ingestion of document {document_id}: {e}")
+        _send_failed_callback(callback_url, document_id)
         raise
     except NotImplementedError as e:
         logger.error(f"Feature not implemented for document {document_id}: {e}")
+        _send_failed_callback(callback_url, document_id)
         raise
     except Exception as e:
         logger.error(
             f"Unexpected error during ingestion of document {document_id}: {e}",
             exc_info=True,
         )
+        _send_failed_callback(callback_url, document_id)
         raise
+
+
+def _send_failed_callback(callback_url: Optional[str], document_id: int):
+    """Send failed status callback if callback_url is provided."""
+    if callback_url:
+        _send_callback_with_retry(
+            callback_url,
+            {
+                "document_id": document_id,
+                "status": "failed",
+            },
+            document_id,
+        )
+
+
+def _send_callback_with_retry(callback_url: str, payload: dict, document_id: int, max_retries: int = 3):
+    """
+    Send callback with retry logic.
+    
+    Args:
+        callback_url: URL to send callback to
+        payload: JSON payload to send
+        document_id: Document ID for logging
+        max_retries: Maximum number of retry attempts
+    """
+    import httpx
+    import socket
+    from urllib.parse import urlparse
+
+    logger.info(f"Attempting to send callback for document {document_id} to {callback_url}")
+
+    # Parse URL to get hostname and port
+    parsed = urlparse(callback_url)
+    hostname = parsed.hostname
+    port = parsed.port or (80 if parsed.scheme == "http" else 443)
+
+    # Test DNS resolution and connectivity
+    try:
+        ip = socket.gethostbyname(hostname)
+        logger.debug(f"Resolved {hostname} to {ip}")
+    except socket.gaierror as e:
+        logger.error(f"DNS resolution failed for {hostname}: {e}")
+        return
+
+    for attempt in range(max_retries):
+        try:
+            logger.debug(f"Sending callback attempt {attempt + 1}/{max_retries} for document {document_id}")
+            response = httpx.post(
+                callback_url,
+                json=payload,
+                timeout=10.0,
+            )
+            response.raise_for_status()
+            logger.info(f"Callback sent successfully for document {document_id} (attempt {attempt + 1})")
+            return
+        except httpx.ConnectError as e:
+            if attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 2  # Exponential backoff: 2s, 4s, 6s
+                logger.warning(
+                    f"Connection error sending callback for document {document_id} "
+                    f"(attempt {attempt + 1}/{max_retries}): {e}. Retrying in {wait_time}s..."
+                )
+                time.sleep(wait_time)
+            else:
+                logger.error(
+                    f"Failed to send callback for document {document_id} after {max_retries} attempts: {e}. "
+                    f"URL: {callback_url}, Hostname: {hostname}, IP: {ip}"
+                )
+        except httpx.HTTPError as e:
+            logger.error(f"HTTP error sending callback for document {document_id}: {e}")
+            return  # Don't retry on HTTP errors (4xx, 5xx)
+        except Exception as e:
+            logger.error(f"Unexpected error sending callback for document {document_id}: {e}")
+            return  # Don't retry on unexpected errors
