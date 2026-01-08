@@ -19,5 +19,6 @@ Including another URLconf
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("documents.urls")),
+    path("api/auth/", include("authentication.urls")),
+    path("api/documents/", include("documents.urls")),
 ]
