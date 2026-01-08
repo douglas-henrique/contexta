@@ -41,5 +41,5 @@ class DOCXLoader(DocumentLoader):
         """Check if file type is DOCX."""
         return file_type.lower() in [
             "docx",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ]

@@ -9,6 +9,7 @@ from typing import Any, Dict, Optional
 @dataclass
 class DocumentMetadata:
     """Metadata for a document being ingested."""
+
     document_id: int
     tenant_id: int
     file_path: str
@@ -21,6 +22,7 @@ class DocumentMetadata:
 @dataclass
 class Chunk:
     """Represents a chunk of text with metadata."""
+
     text: str
     chunk_id: str
     document_id: int

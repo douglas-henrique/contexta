@@ -21,10 +21,7 @@ class IngestRequest(BaseModel):
 
 
 @app.post("/ingest")
-def ingest(
-    payload: IngestRequest,
-    background_tasks: BackgroundTasks
-):
+def ingest(payload: IngestRequest, background_tasks: BackgroundTasks):
     """Trigger document ingestion in background."""
     try:
         background_tasks.add_task(
@@ -36,12 +33,14 @@ def ingest(
             payload.callback_url,
         )
 
-        logger.info(f"Ingestion task queued for document {payload.document_id} (tenant {payload.tenant_id})")
+        logger.info(
+            f"Ingestion task queued for document {payload.document_id} (tenant {payload.tenant_id})"
+        )
 
         return {
             "status": "accepted",
             "document_id": payload.document_id,
-            "tenant_id": payload.tenant_id
+            "tenant_id": payload.tenant_id,
         }
     except Exception as e:
         logger.error(f"Error queuing ingestion task: {e}")
@@ -56,14 +55,7 @@ def health():
 
         # Check Qdrant connection
         _ = client.get_collections()  # noqa: F841
-        return {
-            "status": "ok",
-            "qdrant": "connected",
-            "collection": COLLECTION
-        }
+        return {"status": "ok", "qdrant": "connected", "collection": COLLECTION}
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        return {
-            "status": "error",
-            "error": str(e)
-        }
+        return {"status": "error", "error": str(e)}

@@ -1,8 +1,4 @@
-def semantic_chunk(
-    text: str,
-    max_tokens: int = 500,
-    overlap: int = 100
-):
+def semantic_chunk(text: str, max_tokens: int = 500, overlap: int = 100):
     words = text.split()
     chunks = []
 

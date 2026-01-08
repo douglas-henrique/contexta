@@ -15,12 +15,12 @@ def _detect_file_type(file_path: str) -> str:
     path = Path(file_path)
     extension = path.suffix.lower()
 
-    if extension == '.pdf':
-        return 'pdf'
-    elif extension in ['.txt', '.text']:
-        return 'txt'
-    elif extension == '.docx':
-        return 'docx'
+    if extension == ".pdf":
+        return "pdf"
+    elif extension in [".txt", ".text"]:
+        return "txt"
+    elif extension == ".docx":
+        return "docx"
     else:
         raise ValueError(f"Unsupported file type: {extension}")
 
@@ -45,11 +45,11 @@ def _load_txt(file_path: str) -> str:
 
 def _load_document(file_path: str, file_type: str) -> str:
     """Load document content based on file type."""
-    if file_type == 'pdf':
+    if file_type == "pdf":
         return load_pdf(file_path)
-    elif file_type == 'txt':
+    elif file_type == "txt":
         return _load_txt(file_path)
-    elif file_type == 'docx':
+    elif file_type == "docx":
         raise NotImplementedError("DOCX loading not yet implemented")
     else:
         raise ValueError(f"Unsupported file type: {file_type}")
@@ -60,7 +60,7 @@ def ingest_document(
     file_path: str,
     metadata: dict,
     tenant_id: int,
-    callback_url: Optional[str] = None
+    callback_url: Optional[str] = None,
 ):
     """
     Ingest a document into the vector store.
@@ -73,7 +73,9 @@ def ingest_document(
         callback_url: Optional URL to call when ingestion completes
     """
     try:
-        logger.info(f"Starting ingestion for document {document_id} (tenant {tenant_id})")
+        logger.info(
+            f"Starting ingestion for document {document_id} (tenant {tenant_id})"
+        )
 
         # 1. Detect and load document
         file_type = _detect_file_type(file_path)
@@ -106,20 +108,27 @@ def ingest_document(
             chunks=chunks,
             embeddings=embeddings,
             metadata=metadata,
-            tenant_id=tenant_id
+            tenant_id=tenant_id,
         )
 
-        logger.info(f"Document {document_id} ingested successfully (tenant {tenant_id})")
+        logger.info(
+            f"Document {document_id} ingested successfully (tenant {tenant_id})"
+        )
 
         # 5. Callback if provided
         if callback_url:
             try:
                 import httpx
-                httpx.post(callback_url, json={
-                    "document_id": document_id,
-                    "status": "completed",
-                    "chunks_created": len(chunks)
-                }, timeout=5.0)
+
+                httpx.post(
+                    callback_url,
+                    json={
+                        "document_id": document_id,
+                        "status": "completed",
+                        "chunks_created": len(chunks),
+                    },
+                    timeout=5.0,
+                )
             except Exception as e:
                 logger.warning(f"Failed to send callback: {e}")
 
@@ -133,5 +142,8 @@ def ingest_document(
         logger.error(f"Feature not implemented for document {document_id}: {e}")
         raise
     except Exception as e:
-        logger.error(f"Unexpected error during ingestion of document {document_id}: {e}", exc_info=True)
+        logger.error(
+            f"Unexpected error during ingestion of document {document_id}: {e}",
+            exc_info=True,
+        )
         raise

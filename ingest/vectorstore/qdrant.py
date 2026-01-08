@@ -40,10 +40,7 @@ def _ensure_collection_exists():
 
             client.create_collection(
                 collection_name=COLLECTION,
-                vectors_config=VectorParams(
-                    size=dimension,
-                    distance=Distance.COSINE
-                )
+                vectors_config=VectorParams(size=dimension, distance=Distance.COSINE),
             )
             logger.info(f"Collection {COLLECTION} created successfully")
         else:
@@ -53,11 +50,13 @@ def _ensure_collection_exists():
         raise
 
 
-def store_embeddings(document_id: int,
-                     chunks: List[str],
-                     embeddings: List[List[float]],
-                     metadata: dict,
-                     tenant_id: int):
+def store_embeddings(
+    document_id: int,
+    chunks: List[str],
+    embeddings: List[List[float]],
+    metadata: dict,
+    tenant_id: int,
+):
     """
     Store embeddings in Qdrant with multi-tenant support.
 
@@ -84,17 +83,16 @@ def store_embeddings(document_id: int,
                     "tenant_id": tenant_id,
                     "text": chunk,
                     "chunk_index": idx,
-                    **metadata
-                }
+                    **metadata,
+                },
             )
         )
 
     try:
-        client.upsert(
-            collection_name=COLLECTION,
-            points=points
+        client.upsert(collection_name=COLLECTION, points=points)
+        logger.info(
+            f"Stored {len(points)} chunks for document {document_id} (tenant {tenant_id})"
         )
-        logger.info(f"Stored {len(points)} chunks for document {document_id} (tenant {tenant_id})")
     except Exception as e:
         logger.error(f"Error storing embeddings: {e}")
         raise
@@ -104,7 +102,7 @@ def search(
     query_embedding: List[float],
     tenant_id: int,
     top_k: int = 10,
-    filters: Dict[str, Any] = None
+    filters: Dict[str, Any] = None,
 ) -> List[Dict[str, Any]]:
     """
     Search for similar documents in Qdrant with tenant filtering.
@@ -121,9 +119,7 @@ def search(
     _ensure_collection_exists()
 
     # Build filter conditions
-    conditions = [
-        FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))
-    ]
+    conditions = [FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))]
 
     # Add additional filters if provided
     if filters:
@@ -137,7 +133,7 @@ def search(
             collection_name=COLLECTION,
             query_vector=query_embedding,
             query_filter=query_filter,
-            limit=top_k
+            limit=top_k,
         )
 
         return [

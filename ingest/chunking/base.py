@@ -19,7 +19,7 @@ class Chunker(ABC):
         tenant_id: str,
         metadata: Dict[str, Any],
         chunk_size: int = 1000,
-        chunk_overlap: int = 200
+        chunk_overlap: int = 200,
     ) -> List[Chunk]:
         """
         Split content into chunks.

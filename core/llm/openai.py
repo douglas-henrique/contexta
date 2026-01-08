@@ -23,7 +23,7 @@ class OpenAILLM(LLMProvider):
         model: str = "gpt-4o-mini",
         api_key: Optional[str] = None,
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None
+        max_tokens: Optional[int] = None,
     ):
         """
         Initialize OpenAI LLM provider.
@@ -49,7 +49,7 @@ class OpenAILLM(LLMProvider):
         prompt: str,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """
         Generate text completion from a prompt.
@@ -66,12 +66,10 @@ class OpenAILLM(LLMProvider):
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 temperature=temperature,
                 max_tokens=max_tokens or self.default_max_tokens,
-                **kwargs
+                **kwargs,
             )
 
             return response.choices[0].message.content
@@ -83,7 +81,7 @@ class OpenAILLM(LLMProvider):
         prompt: str,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Generate text completion with streaming.
@@ -100,13 +98,11 @@ class OpenAILLM(LLMProvider):
         try:
             stream = self.client.chat.completions.create(
                 model=self.model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 temperature=temperature,
                 max_tokens=max_tokens or self.default_max_tokens,
                 stream=True,
-                **kwargs
+                **kwargs,
             )
 
             for chunk in stream:

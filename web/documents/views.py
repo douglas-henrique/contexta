@@ -21,7 +21,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         document = serializer.save(owner=self.request.user)
 
         # Update status to processing
-        document.status = 'processing'
+        document.status = "processing"
         document.save()
 
         # Get file path
@@ -29,7 +29,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
         if not file_path:
             logger.error(f"Document {document.id} has no file path")
-            document.status = 'failed'
+            document.status = "failed"
             document.save()
             return
 
@@ -45,18 +45,25 @@ class DocumentViewSet(viewsets.ModelViewSet):
                     user_id=self.request.user.id,
                     metadata={
                         "title": document.title,
-                        "created_at": document.created_at.isoformat() if document.created_at else None,
-                    }
+                        "created_at": (
+                            document.created_at.isoformat()
+                            if document.created_at
+                            else None
+                        ),
+                    },
                 )
 
                 if success:
-                    document.status = 'processing'
+                    document.status = "processing"
                 else:
-                    document.status = 'failed'
+                    document.status = "failed"
                 document.save()
             except Exception as e:
-                logger.error(f"Error in background ingestion for document {document.id}: {e}", exc_info=True)
-                document.status = 'failed'
+                logger.error(
+                    f"Error in background ingestion for document {document.id}: {e}",
+                    exc_info=True,
+                )
+                document.status = "failed"
                 document.save()
 
         thread = threading.Thread(target=ingest_in_background)

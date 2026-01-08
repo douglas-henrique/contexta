@@ -26,6 +26,7 @@ reranker = SimpleReranker()
 
 class QueryRequest(BaseModel):
     """Request model for query endpoint."""
+
     query: str
     tenant_id: int
     top_k: int = 10
@@ -35,6 +36,7 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     """Response model for query endpoint."""
+
     answer: str
     sources: List[Dict[str, Any]]
     query: str
@@ -60,7 +62,9 @@ async def query_documents(request: QueryRequest):
     6. Return answer with sources
     """
     try:
-        logger.info(f"Processing query for tenant {request.tenant_id}: {request.query[:50]}...")
+        logger.info(
+            f"Processing query for tenant {request.tenant_id}: {request.query[:50]}..."
+        )
 
         # 1. Generate query embedding
         logger.debug("Generating query embedding")
@@ -72,7 +76,7 @@ async def query_documents(request: QueryRequest):
         search_results = search(
             query_embedding=query_embedding,
             tenant_id=request.tenant_id,
-            top_k=request.top_k
+            top_k=request.top_k,
         )
 
         if not search_results:
@@ -80,14 +84,16 @@ async def query_documents(request: QueryRequest):
                 answer="I couldn't find any relevant information in the documents.",
                 sources=[],
                 query=request.query,
-                tenant_id=request.tenant_id
+                tenant_id=request.tenant_id,
             )
 
             logger.debug(f"Found {len(search_results)} search results")
 
             # Check if we have any results
             if not search_results:
-                logger.info(f"No results found for tenant {request.tenant_id} query: {request.query}")
+                logger.info(
+                    f"No results found for tenant {request.tenant_id} query: {request.query}"
+                )
                 return QueryResponse(
                     answer=(
                         "I couldn't find any relevant information in the documents "
@@ -96,15 +102,13 @@ async def query_documents(request: QueryRequest):
                     ),
                     sources=[],
                     query=request.query,
-                    tenant_id=request.tenant_id
+                    tenant_id=request.tenant_id,
                 )
 
             # 3. Re-rank results
             logger.debug(f"Re-ranking results (top_k={request.rerank_top_k})")
             reranked_results = reranker.rerank(
-                query=request.query,
-                results=search_results,
-                top_k=request.rerank_top_k
+                query=request.query, results=search_results, top_k=request.rerank_top_k
             )
 
         logger.debug(f"Selected {len(reranked_results)} results after re-ranking")
@@ -115,16 +119,12 @@ async def query_documents(request: QueryRequest):
             question=request.query,
             context_chunks=reranked_results,
             max_context_length=request.max_context_length,
-            include_sources=True
+            include_sources=True,
         )
 
         # 5. Generate answer using LLM
         logger.debug("Generating answer with LLM")
-        answer = llm.generate(
-            prompt=prompt,
-            temperature=0.7,
-            max_tokens=1000
-        )
+        answer = llm.generate(prompt=prompt, temperature=0.7, max_tokens=1000)
 
         # 6. Prepare sources
         sources = [
@@ -147,7 +147,7 @@ async def query_documents(request: QueryRequest):
             answer=answer,
             sources=sources,
             query=request.query,
-            tenant_id=request.tenant_id
+            tenant_id=request.tenant_id,
         )
 
     except Exception as e:
@@ -167,6 +167,7 @@ def health():
 
         # Check OpenAI (basic check - just verify key is set)
         import os
+
         openai_key = os.getenv("OPENAI_API_KEY")
         openai_status = "configured" if openai_key else "missing"
 
@@ -174,11 +175,8 @@ def health():
             "status": "ok",
             "qdrant": qdrant_status,
             "openai": openai_status,
-            "collection": COLLECTION
+            "collection": COLLECTION,
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        return {
-            "status": "error",
-            "error": str(e)
-        }
+        return {"status": "error", "error": str(e)}

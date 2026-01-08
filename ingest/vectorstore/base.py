@@ -13,10 +13,7 @@ class VectorStore(ABC):
 
     @abstractmethod
     async def add_documents(
-        self,
-        chunks: List[Chunk],
-        embeddings: List[List[float]],
-        tenant_id: str
+        self, chunks: List[Chunk], embeddings: List[List[float]], tenant_id: str
     ) -> None:
         """
         Add documents to the vector store.
@@ -34,7 +31,7 @@ class VectorStore(ABC):
         query_embedding: List[float],
         tenant_id: str,
         top_k: int = 10,
-        filters: Optional[Dict[str, Any]] = None
+        filters: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
         Search for similar documents.
@@ -51,11 +48,7 @@ class VectorStore(ABC):
         pass
 
     @abstractmethod
-    async def delete_document(
-        self,
-        document_id: int,
-        tenant_id: str
-    ) -> None:
+    async def delete_document(self, document_id: int, tenant_id: str) -> None:
         """
         Delete all chunks for a document.
 

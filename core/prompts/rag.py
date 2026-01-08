@@ -22,7 +22,7 @@ class RAGPromptBuilder(PromptBuilder):
         system_instruction: str = None,
         context_prefix: str = "Context:",
         question_prefix: str = "Question:",
-        answer_prefix: str = "Answer:"
+        answer_prefix: str = "Answer:",
     ):
         """
         Initialize RAG prompt builder.
@@ -33,7 +33,9 @@ class RAGPromptBuilder(PromptBuilder):
             question_prefix: Prefix for question section
             answer_prefix: Prefix for answer section
         """
-        self.system_instruction = system_instruction or self._default_system_instruction()
+        self.system_instruction = (
+            system_instruction or self._default_system_instruction()
+        )
         self.context_prefix = context_prefix
         self.question_prefix = question_prefix
         self.answer_prefix = answer_prefix
@@ -52,7 +54,7 @@ class RAGPromptBuilder(PromptBuilder):
         self,
         question: str,
         context_chunks: List[Dict[str, Any]],
-        max_context_length: int = 3000
+        max_context_length: int = 3000,
     ) -> str:
         """
         Build RAG prompt with context and question.
@@ -70,7 +72,7 @@ class RAGPromptBuilder(PromptBuilder):
         current_length = 0
 
         for chunk in context_chunks:
-            chunk_text = chunk.get('text', '')
+            chunk_text = chunk.get("text", "")
             if current_length + len(chunk_text) > max_context_length:
                 break
 
@@ -88,7 +90,7 @@ class RAGPromptBuilder(PromptBuilder):
             "",
             f"{self.question_prefix} {question}",
             "",
-            f"{self.answer_prefix}"
+            f"{self.answer_prefix}",
         ]
 
         return "\n".join(prompt_parts)
@@ -98,7 +100,7 @@ class RAGPromptBuilder(PromptBuilder):
         question: str,
         context_chunks: List[Dict[str, Any]],
         max_context_length: int = 3000,
-        include_sources: bool = True
+        include_sources: bool = True,
     ) -> str:
         """
         Build RAG prompt with context, question, and source citations.
@@ -117,12 +119,12 @@ class RAGPromptBuilder(PromptBuilder):
         current_length = 0
 
         for idx, chunk in enumerate(context_chunks, 1):
-            chunk_text = chunk.get('text', '')
+            chunk_text = chunk.get("text", "")
             source_info = ""
 
             if include_sources:
-                doc_id = chunk.get('document_id', 'unknown')
-                chunk_idx = chunk.get('chunk_index', idx)
+                doc_id = chunk.get("document_id", "unknown")
+                chunk_idx = chunk.get("chunk_index", idx)
                 source_info = f" [Source: Document {doc_id}, Chunk {chunk_idx}]"
 
             full_chunk = f"{chunk_text}{source_info}"
@@ -144,7 +146,7 @@ class RAGPromptBuilder(PromptBuilder):
             "",
             f"{self.question_prefix} {question}",
             "",
-            f"{self.answer_prefix}"
+            f"{self.answer_prefix}",
         ]
 
         return "\n".join(prompt_parts)
