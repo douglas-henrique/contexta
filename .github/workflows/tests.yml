@@ -24,19 +24,24 @@ jobs:
         with:
           python-version: '3.11'
       
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-poetry-
       
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-mock pytest-asyncio
+          poetry install --no-interaction --no-root
       
       - name: Wait for Qdrant
         run: |
@@ -56,7 +61,7 @@ jobs:
           QDRANT_URL: http://localhost:6333
           QDRANT_COLLECTION: test_contexta_documents
         run: |
-          pytest --cov --cov-report=xml --cov-report=term-missing
+          poetry run pytest --cov --cov-report=xml --cov-report=term-missing
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -75,20 +80,34 @@ jobs:
         with:
           python-version: '3.11'
       
-      - name: Install linting tools
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8 black isort
+          poetry install --no-interaction --no-root
       
       - name: Run flake8
         run: |
-          flake8 core/ ingest/ api/ web/ --max-line-length=120 --exclude=migrations
+          poetry run flake8 core/ ingest/ api/ web/ --max-line-length=120 --exclude=migrations
       
       - name: Check black formatting
         run: |
-          black --check core/ ingest/ api/ web/ --exclude=migrations
+          poetry run black --check core/ ingest/ api/ web/ --exclude=migrations
       
       - name: Check isort
         run: |
-          isort --check-only core/ ingest/ api/ web/ --skip=migrations
+          poetry run isort --check-only core/ ingest/ api/ web/ --skip=migrations
 
