@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 class Document(models.Model):
     STATUS_CHOICES = [
@@ -21,7 +22,7 @@ class Document(models.Model):
     def __str__(self):
         return self.title
 
-#CRIAR MIGRAÇOES
-#python manage.py makemigrations
-#python manage.py migrate
-#super user password: bia@0996
+# CRIAR MIGRAÇOES
+# python manage.py makemigrations
+# python manage.py migrate
+# super user password: bia@0996

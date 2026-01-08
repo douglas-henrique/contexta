@@ -3,7 +3,7 @@ Data models for ingest service.
 """
 
 from dataclasses import dataclass
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -28,4 +28,3 @@ class Chunk:
     metadata: Dict[str, Any]
     start_index: Optional[int] = None
     end_index: Optional[int] = None
-

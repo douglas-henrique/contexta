@@ -7,4 +7,3 @@ This module handles:
 - Embedding generation
 - Vector store operations
 """
-

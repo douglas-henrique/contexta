@@ -1,2 +1,1 @@
 """Embeddings generation modules."""
-

@@ -1,9 +1,18 @@
-from qdrant_client import QdrantClient
-from qdrant_client.models import PointStruct, Distance, VectorParams, Filter, FieldCondition, MatchValue
-from typing import List, Dict, Any
-import uuid
 import logging
-from ..config import QDRANT_URL, QDRANT_COLLECTION, OPENAI_EMBEDDING_MODEL
+import uuid
+from typing import Any, Dict, List
+
+from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
+    PointStruct,
+    VectorParams,
+)
+
+from ..config import OPENAI_EMBEDDING_MODEL, QDRANT_COLLECTION, QDRANT_URL
 
 logger = logging.getLogger(__name__)
 
@@ -18,16 +27,17 @@ EMBEDDING_DIMENSIONS = {
     "text-embedding-ada-002": 1536,
 }
 
+
 def _ensure_collection_exists():
     """Ensure the collection exists with correct configuration."""
     try:
-        collections = client.get_collections().collections
-        collection_names = [c.name for c in collections]
-        
+        collection_list = client.get_collections().collections
+        collection_names = [c.name for c in collection_list]
+
         if COLLECTION not in collection_names:
             dimension = EMBEDDING_DIMENSIONS.get(OPENAI_EMBEDDING_MODEL, 3072)
             logger.info(f"Creating collection {COLLECTION} with dimension {dimension}")
-            
+
             client.create_collection(
                 collection_name=COLLECTION,
                 vectors_config=VectorParams(
@@ -43,10 +53,14 @@ def _ensure_collection_exists():
         raise
 
 
-def store_embeddings(document_id: int, chunks: List[str], embeddings: List[List[float]], metadata: dict, tenant_id: int):
+def store_embeddings(document_id: int,
+                     chunks: List[str],
+                     embeddings: List[List[float]],
+                     metadata: dict,
+                     tenant_id: int):
     """
     Store embeddings in Qdrant with multi-tenant support.
-    
+
     Args:
         document_id: ID of the document
         chunks: List of text chunks
@@ -55,10 +69,10 @@ def store_embeddings(document_id: int, chunks: List[str], embeddings: List[List[
         tenant_id: Tenant identifier for multi-tenant isolation
     """
     _ensure_collection_exists()
-    
+
     if len(chunks) != len(embeddings):
         raise ValueError("Chunks and embeddings must have the same length")
-    
+
     points = []
     for idx, (chunk, vector) in enumerate(zip(chunks, embeddings)):
         points.append(
@@ -74,7 +88,7 @@ def store_embeddings(document_id: int, chunks: List[str], embeddings: List[List[
                 }
             )
         )
-    
+
     try:
         client.upsert(
             collection_name=COLLECTION,
@@ -94,30 +108,30 @@ def search(
 ) -> List[Dict[str, Any]]:
     """
     Search for similar documents in Qdrant with tenant filtering.
-    
+
     Args:
         query_embedding: Query embedding vector
         tenant_id: Tenant identifier for filtering
         top_k: Number of results to return
         filters: Additional metadata filters
-        
+
     Returns:
         List of search results with scores and metadata
     """
     _ensure_collection_exists()
-    
+
     # Build filter conditions
     conditions = [
         FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))
     ]
-    
+
     # Add additional filters if provided
     if filters:
         for key, value in filters.items():
             conditions.append(FieldCondition(key=key, match=MatchValue(value=value)))
-    
+
     query_filter = Filter(must=conditions) if conditions else None
-    
+
     try:
         results = client.search(
             collection_name=COLLECTION,
@@ -125,7 +139,7 @@ def search(
             query_filter=query_filter,
             limit=top_k
         )
-        
+
         return [
             {
                 "id": result.id,

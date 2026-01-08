@@ -1,6 +1,7 @@
-from openai import OpenAI
 import os
+
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
@@ -11,6 +12,7 @@ if not api_key:
 client = OpenAI(api_key=api_key)
 
 EMBEDDING_MODEL = os.getenv('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-large')
+
 
 def embed_texts(texts: list[str]):
     response = client.embeddings.create(

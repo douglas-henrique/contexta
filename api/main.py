@@ -1,16 +1,17 @@
 # api/main.py
 # uvicorn api.main:app --reload
 
+import logging
+from typing import Any, Dict, List
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-import logging
 
-from ingest.embeddings.openai import embed_texts
-from ingest.vectorstore.qdrant import search
 from core.llm import OpenAILLM
 from core.prompts import RAGPromptBuilder
 from core.reranker import SimpleReranker
+from ingest.embeddings.openai import embed_texts
+from ingest.vectorstore.qdrant import search
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ def read_root():
 async def query_documents(request: QueryRequest):
     """
     Query documents using RAG pipeline.
-    
+
     Pipeline:
     1. Generate embedding for query
     2. Search in vector store
@@ -60,12 +61,12 @@ async def query_documents(request: QueryRequest):
     """
     try:
         logger.info(f"Processing query for tenant {request.tenant_id}: {request.query[:50]}...")
-        
+
         # 1. Generate query embedding
         logger.debug("Generating query embedding")
         query_embeddings = embed_texts([request.query])
         query_embedding = query_embeddings[0]
-        
+
         # 2. Search in vector store
         logger.debug(f"Searching vector store (top_k={request.top_k})")
         search_results = search(
@@ -73,7 +74,7 @@ async def query_documents(request: QueryRequest):
             tenant_id=request.tenant_id,
             top_k=request.top_k
         )
-        
+
         if not search_results:
             return QueryResponse(
                 answer="I couldn't find any relevant information in the documents.",
@@ -81,14 +82,18 @@ async def query_documents(request: QueryRequest):
                 query=request.query,
                 tenant_id=request.tenant_id
             )
-        
+
             logger.debug(f"Found {len(search_results)} search results")
 
             # Check if we have any results
             if not search_results:
                 logger.info(f"No results found for tenant {request.tenant_id} query: {request.query}")
                 return QueryResponse(
-                    answer="I couldn't find any relevant information in the documents to answer your question. Please try rephrasing your query or check if documents have been uploaded.",
+                    answer=(
+                        "I couldn't find any relevant information in the documents "
+                        "to answer your question. Please try rephrasing your query "
+                        "or check if documents have been uploaded."
+                    ),
                     sources=[],
                     query=request.query,
                     tenant_id=request.tenant_id
@@ -101,9 +106,9 @@ async def query_documents(request: QueryRequest):
                 results=search_results,
                 top_k=request.rerank_top_k
             )
-        
+
         logger.debug(f"Selected {len(reranked_results)} results after re-ranking")
-        
+
         # 4. Build prompt with context
         logger.debug("Building RAG prompt")
         prompt = prompt_builder.build_with_sources(
@@ -112,7 +117,7 @@ async def query_documents(request: QueryRequest):
             max_context_length=request.max_context_length,
             include_sources=True
         )
-        
+
         # 5. Generate answer using LLM
         logger.debug("Generating answer with LLM")
         answer = llm.generate(
@@ -120,27 +125,31 @@ async def query_documents(request: QueryRequest):
             temperature=0.7,
             max_tokens=1000
         )
-        
+
         # 6. Prepare sources
         sources = [
             {
                 "document_id": result.get("document_id"),
                 "chunk_index": result.get("chunk_index"),
                 "score": result.get("score"),
-                "text_preview": result.get("text", "")[:200] + "..." if len(result.get("text", "")) > 200 else result.get("text", "")
+                "text_preview": (
+                    result.get("text", "")[:200] + "..."
+                    if len(result.get("text", "")) > 200
+                    else result.get("text", "")
+                ),
             }
             for result in reranked_results
         ]
-        
+
         logger.info(f"Query completed successfully for tenant {request.tenant_id}")
-        
+
         return QueryResponse(
             answer=answer,
             sources=sources,
             query=request.query,
             tenant_id=request.tenant_id
         )
-        
+
     except Exception as e:
         logger.error(f"Error processing query: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error processing query: {str(e)}")
@@ -150,17 +159,17 @@ async def query_documents(request: QueryRequest):
 def health():
     """Health check endpoint."""
     try:
-        from ingest.vectorstore.qdrant import client, COLLECTION
-        
+        from ingest.vectorstore.qdrant import COLLECTION, client
+
         # Check Qdrant connection
-        collections = client.get_collections()
+        _ = client.get_collections()  # noqa: F841
         qdrant_status = "connected"
-        
+
         # Check OpenAI (basic check - just verify key is set)
         import os
         openai_key = os.getenv("OPENAI_API_KEY")
         openai_status = "configured" if openai_key else "missing"
-        
+
         return {
             "status": "ok",
             "qdrant": qdrant_status,

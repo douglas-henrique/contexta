@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-#python manage.py runserver
-#python manage.py migrate
-#python manage.py createsuperuser
-#python manage.py startapp documents
+# python manage.py runserver
+# python manage.py migrate
+# python manage.py createsuperuser
+# python manage.py startapp documents
 
 """Django's command-line utility for administrative tasks."""
 import os

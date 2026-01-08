@@ -1,9 +1,10 @@
 import logging
 from pathlib import Path
 from typing import Optional
-from ingest.loaders.pdf import load_pdf
+
 from ingest.chunking.semantic import semantic_chunk
 from ingest.embeddings.openai import embed_texts
+from ingest.loaders.pdf import load_pdf
 from ingest.vectorstore.qdrant import store_embeddings
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ def _detect_file_type(file_path: str) -> str:
     """Detect file type from extension."""
     path = Path(file_path)
     extension = path.suffix.lower()
-    
+
     if extension == '.pdf':
         return 'pdf'
     elif extension in ['.txt', '.text']:
@@ -29,7 +30,7 @@ def _load_txt(file_path: str) -> str:
     path = Path(file_path)
     if not path.exists():
         raise FileNotFoundError(f"File not found: {file_path}")
-    
+
     # Try different encodings
     encodings = ["utf-8", "latin-1", "cp1252"]
     for encoding in encodings:
@@ -38,7 +39,7 @@ def _load_txt(file_path: str) -> str:
                 return f.read()
         except UnicodeDecodeError:
             continue
-    
+
     raise ValueError(f"Could not decode file: {file_path}")
 
 
@@ -63,7 +64,7 @@ def ingest_document(
 ):
     """
     Ingest a document into the vector store.
-    
+
     Args:
         document_id: ID of the document
         file_path: Path to the document file
@@ -73,31 +74,31 @@ def ingest_document(
     """
     try:
         logger.info(f"Starting ingestion for document {document_id} (tenant {tenant_id})")
-        
+
         # 1. Detect and load document
         file_type = _detect_file_type(file_path)
         logger.debug(f"Detected file type: {file_type}")
-        
+
         text = _load_document(file_path, file_type)
         if not text or not text.strip():
             raise ValueError(f"Document {document_id} is empty")
         logger.debug(f"Loaded {len(text)} characters from document")
-        
+
         # 2. Chunk content
         chunks = semantic_chunk(text)
         logger.info(f"Created {len(chunks)} chunks from document {document_id}")
-        
+
         if not chunks:
             raise ValueError(f"No chunks created from document {document_id}")
-        
+
         # 3. Generate embeddings
         logger.debug(f"Generating embeddings for {len(chunks)} chunks")
         embeddings = embed_texts(chunks)
         logger.debug(f"Generated {len(embeddings)} embeddings")
-        
+
         if len(chunks) != len(embeddings):
             raise ValueError("Mismatch between chunks and embeddings count")
-        
+
         # 4. Store in vector store
         logger.debug(f"Storing {len(chunks)} chunks in vector store")
         store_embeddings(
@@ -107,9 +108,9 @@ def ingest_document(
             metadata=metadata,
             tenant_id=tenant_id
         )
-        
+
         logger.info(f"Document {document_id} ingested successfully (tenant {tenant_id})")
-        
+
         # 5. Callback if provided
         if callback_url:
             try:
@@ -121,7 +122,7 @@ def ingest_document(
                 }, timeout=5.0)
             except Exception as e:
                 logger.warning(f"Failed to send callback: {e}")
-        
+
     except FileNotFoundError as e:
         logger.error(f"File not found for document {document_id}: {e}")
         raise

@@ -1,7 +1,8 @@
-from fastapi import FastAPI, BackgroundTasks, HTTPException
-from pydantic import BaseModel
-from typing import Optional
 import logging
+from typing import Optional
+
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from pydantic import BaseModel
 
 from ingest.tasks import ingest_document
 
@@ -10,12 +11,14 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Contexta Ingest Service")
 
+
 class IngestRequest(BaseModel):
     document_id: int
     file_path: str
     tenant_id: int
     metadata: dict = {}
     callback_url: Optional[str] = None
+
 
 @app.post("/ingest")
 def ingest(
@@ -32,9 +35,9 @@ def ingest(
             payload.tenant_id,
             payload.callback_url,
         )
-        
+
         logger.info(f"Ingestion task queued for document {payload.document_id} (tenant {payload.tenant_id})")
-        
+
         return {
             "status": "accepted",
             "document_id": payload.document_id,
@@ -44,13 +47,15 @@ def ingest(
         logger.error(f"Error queuing ingestion task: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/health")
 def health():
     """Health check endpoint."""
     try:
-        from ingest.vectorstore.qdrant import client, COLLECTION
+        from ingest.vectorstore.qdrant import COLLECTION, client
+
         # Check Qdrant connection
-        collections = client.get_collections()
+        _ = client.get_collections()  # noqa: F841
         return {
             "status": "ok",
             "qdrant": "connected",

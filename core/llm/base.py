@@ -3,12 +3,12 @@ Base interface for LLM providers.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any
+from typing import Optional
 
 
 class LLMProvider(ABC):
     """Abstract base class for LLM providers."""
-    
+
     @abstractmethod
     def generate(
         self,
@@ -19,18 +19,18 @@ class LLMProvider(ABC):
     ) -> str:
         """
         Generate text completion from a prompt.
-        
+
         Args:
             prompt: Input prompt text
             temperature: Sampling temperature (0.0 to 2.0)
             max_tokens: Maximum tokens to generate
             **kwargs: Additional provider-specific parameters
-            
+
         Returns:
             Generated text response
         """
         pass
-    
+
     @abstractmethod
     def generate_stream(
         self,
@@ -41,25 +41,24 @@ class LLMProvider(ABC):
     ):
         """
         Generate text completion with streaming.
-        
+
         Args:
             prompt: Input prompt text
             temperature: Sampling temperature
             max_tokens: Maximum tokens to generate
             **kwargs: Additional provider-specific parameters
-            
+
         Yields:
             Text chunks as they are generated
         """
         pass
-    
+
     @abstractmethod
     def get_model_name(self) -> str:
         """
         Get the name of the model being used.
-        
+
         Returns:
             Model name string
         """
         pass
-

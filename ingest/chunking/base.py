@@ -3,13 +3,14 @@ Base interface for chunking strategies.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from ..models import Chunk
 
 
 class Chunker(ABC):
     """Abstract base class for chunking strategies."""
-    
+
     @abstractmethod
     async def chunk(
         self,
@@ -22,7 +23,7 @@ class Chunker(ABC):
     ) -> List[Chunk]:
         """
         Split content into chunks.
-        
+
         Args:
             content: Text content to chunk
             document_id: ID of the source document
@@ -30,9 +31,8 @@ class Chunker(ABC):
             metadata: Additional metadata to attach to chunks
             chunk_size: Target size for each chunk (in characters or tokens)
             chunk_overlap: Overlap between chunks
-            
+
         Returns:
             List of Chunk objects
         """
         pass
-
