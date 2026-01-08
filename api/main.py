@@ -18,10 +18,34 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Contexta API", description="API for Contexta RAG application")
 
-# Initialize components
-llm = OpenAILLM()
-prompt_builder = RAGPromptBuilder()
-reranker = SimpleReranker()
+# Lazy initialization for components
+_llm = None
+_prompt_builder = None
+_reranker = None
+
+
+def _get_llm() -> OpenAILLM:
+    """Get or create OpenAI LLM instance with lazy initialization."""
+    global _llm
+    if _llm is None:
+        _llm = OpenAILLM()
+    return _llm
+
+
+def _get_prompt_builder() -> RAGPromptBuilder:
+    """Get or create RAG prompt builder with lazy initialization."""
+    global _prompt_builder
+    if _prompt_builder is None:
+        _prompt_builder = RAGPromptBuilder()
+    return _prompt_builder
+
+
+def _get_reranker() -> SimpleReranker:
+    """Get or create reranker with lazy initialization."""
+    global _reranker
+    if _reranker is None:
+        _reranker = SimpleReranker()
+    return _reranker
 
 
 class QueryRequest(BaseModel):
@@ -103,13 +127,15 @@ async def query_documents(request: QueryRequest):
 
             # 3. Re-rank results
             logger.debug(f"Re-ranking results (top_k={request.rerank_top_k})")
-            reranked_results = reranker.rerank(query=request.query, results=search_results, top_k=request.rerank_top_k)
+            reranked_results = _get_reranker().rerank(
+                query=request.query, results=search_results, top_k=request.rerank_top_k
+            )
 
         logger.debug(f"Selected {len(reranked_results)} results after re-ranking")
 
         # 4. Build prompt with context
         logger.debug("Building RAG prompt")
-        prompt = prompt_builder.build_with_sources(
+        prompt = _get_prompt_builder().build_with_sources(
             question=request.query,
             context_chunks=reranked_results,
             max_context_length=request.max_context_length,
@@ -118,7 +144,7 @@ async def query_documents(request: QueryRequest):
 
         # 5. Generate answer using LLM
         logger.debug("Generating answer with LLM")
-        answer = llm.generate(prompt=prompt, temperature=0.7, max_tokens=1000)
+        answer = _get_llm().generate(prompt=prompt, temperature=0.7, max_tokens=1000)
 
         # 6. Prepare sources
         sources = [
@@ -153,9 +179,10 @@ async def query_documents(request: QueryRequest):
 def health():
     """Health check endpoint."""
     try:
-        from ingest.vectorstore.qdrant import COLLECTION, client
+        from ingest.vectorstore.qdrant import COLLECTION, _get_client
 
         # Check Qdrant connection
+        client = _get_client()
         _ = client.get_collections()  # noqa: F841
         qdrant_status = "connected"
 
