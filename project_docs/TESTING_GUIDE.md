@@ -1,59 +1,59 @@
-# 🧪 Guia Completo de Testes - Contexta
+# 🧪 Complete Testing Guide - Contexta
 
-## 📊 Visão Geral
+## 📊 Overview
 
-Suíte completa de testes unitários para garantir qualidade e confiabilidade do código.
+Complete unit test suite to ensure code quality and reliability.
 
-### Estatísticas
-- **Total de Arquivos de Teste**: 12
-- **Módulos Cobertos**: Core, Ingest, API
-- **Tipos de Teste**: Unitários, Integração (CI/CD ready)
+### Statistics
+- **Total Test Files**: 12
+- **Modules Covered**: Core, Ingest, API
+- **Test Types**: Unit, Integration (CI/CD ready)
 - **Framework**: pytest + pytest-cov + pytest-mock
 
 ---
 
-## 🗂️ Estrutura de Testes
+## 🗂️ Test Structure
 
 ```
 tests/
-├── conftest.py                    # 🔧 Fixtures compartilhadas
-│   ├── mock_openai_client         # Mock do OpenAI
-│   ├── mock_qdrant_client         # Mock do Qdrant
-│   ├── sample_text                # Textos de exemplo
-│   ├── sample_chunks               # Chunks de exemplo
-│   ├── sample_embeddings          # Embeddings de exemplo
-│   └── sample_search_results      # Resultados de busca
+├── conftest.py                    # 🔧 Shared fixtures
+│   ├── mock_openai_client         # OpenAI mock
+│   ├── mock_qdrant_client         # Qdrant mock
+│   ├── sample_text                # Sample texts
+│   ├── sample_chunks               # Sample chunks
+│   ├── sample_embeddings          # Sample embeddings
+│   └── sample_search_results      # Sample search results
 │
-├── test_core/                     # ✅ Testes do Core (Framework-agnostic)
-│   ├── test_llm.py                # Testes de LLM providers
-│   │   ├── TestOpenAILLM
-│   │   │   ├── test_initialization
-│   │   │   ├── test_generate
-│   │   │   ├── test_generate_with_parameters
-│   │   │   └── test_generate_stream
+├── test_core/                     # ✅ Core Tests (Framework-agnostic)
+│   ├── test_llm.py                # LLM provider tests
+│   │   └── TestOpenAILLM
+│   │       ├── test_initialization
+│   │       ├── test_generate
+│   │       ├── test_generate_with_parameters
+│   │       └── test_generate_stream
 │   │   
-│   ├── test_prompts.py            # Testes de Prompt Builders
+│   ├── test_prompts.py            # Prompt Builder tests
 │   │   └── TestRAGPromptBuilder
 │   │       ├── test_initialization
 │   │       ├── test_build_basic
 │   │       ├── test_build_with_max_length
 │   │       └── test_build_with_sources
 │   │
-│   └── test_reranker.py           # Testes de Re-rankers
+│   └── test_reranker.py           # Re-ranker tests
 │       └── TestSimpleReranker
 │           ├── test_rerank_by_score
 │           ├── test_rerank_top_k
 │           └── test_rerank_empty_results
 │
-├── test_ingest/                   # 📥 Testes do Ingest Service
-│   ├── test_chunking.py           # Testes de Chunking
+├── test_ingest/                   # 📥 Ingest Service Tests
+│   ├── test_chunking.py           # Chunking tests
 │   │   └── TestSemanticChunking
 │   │       ├── test_basic_chunking
 │   │       ├── test_chunk_size
 │   │       ├── test_chunk_overlap
 │   │       └── test_empty_text
 │   │
-│   ├── test_loaders.py            # Testes de Document Loaders
+│   ├── test_loaders.py            # Document Loader tests
 │   │   ├── TestPDFLoader
 │   │   │   └── test_load_pdf
 │   │   └── TestLoaderFactory
@@ -61,20 +61,20 @@ tests/
 │   │       ├── test_load_document_pdf
 │   │       └── test_load_document_txt
 │   │
-│   ├── test_embeddings.py         # Testes de Embeddings
+│   ├── test_embeddings.py         # Embedding tests
 │   │   └── TestOpenAIEmbeddings
 │   │       ├── test_embed_texts
 │   │       └── test_embed_texts_custom_model
 │   │
-│   └── test_vectorstore.py        # Testes de Vector Store
+│   └── test_vectorstore.py        # Vector Store tests
 │       └── TestQdrantVectorStore
 │           ├── test_ensure_collection_exists
 │           ├── test_store_embeddings
 │           ├── test_search
 │           └── test_search_with_filters
 │
-└── test_api/                      # 🚀 Testes da API
-    └── test_main.py               # Testes de Endpoints
+└── test_api/                      # 🚀 API Tests
+    └── test_main.py               # Endpoint tests
         └── TestAPIEndpoints
             ├── test_root_endpoint
             ├── test_health_endpoint
@@ -85,106 +85,106 @@ tests/
 
 ---
 
-## 🚀 Como Executar
+## 🚀 How to Run
 
-### Método 1: Script de Teste (Recomendado)
+### Method 1: Test Script (Recommended)
 
 ```bash
-# Todos os testes
+# All tests
 ./run_tests.sh
 
-# Testes com cobertura (gera relatório HTML)
+# Tests with coverage (generates HTML report)
 ./run_tests.sh cov
 
-# Apenas testes unitários
+# Only unit tests
 ./run_tests.sh unit
 
-# Apenas testes de integração
+# Only integration tests
 ./run_tests.sh integration
 
-# Testes rápidos (exclui @pytest.mark.slow)
+# Fast tests (excludes @pytest.mark.slow)
 ./run_tests.sh fast
 
-# Modo watch (reexecuta ao salvar arquivos)
+# Watch mode (reruns on file save)
 ./run_tests.sh watch
 ```
 
-### Método 2: Poetry Direto
+### Method 2: Poetry Direct
 
 ```bash
-# Todos os testes com verbosidade
+# All tests with verbosity
 poetry run pytest -v
 
-# Com cobertura
+# With coverage
 poetry run pytest --cov --cov-report=term-missing
 
-# Testes específicos
+# Specific tests
 poetry run pytest tests/test_core/test_llm.py
 
-# Uma classe específica
+# A specific class
 poetry run pytest tests/test_core/test_llm.py::TestOpenAILLM
 
-# Um teste específico
+# A specific test
 poetry run pytest tests/test_core/test_llm.py::TestOpenAILLM::test_generate
 
-# Parar no primeiro erro
+# Stop on first error
 poetry run pytest -x
 
-# Ver outputs (print statements)
+# Show outputs (print statements)
 poetry run pytest -s
 
-# Modo watch
+# Watch mode
 poetry run pytest-watch
 ```
 
-### Método 3: Makefile
+### Method 3: Makefile
 
 ```bash
-# Todos os testes
+# All tests
 make test
 
-# Com cobertura
+# With coverage
 make test-cov
 
-# Apenas unitários
+# Only unit tests
 make test-unit
 
-# Apenas integração
+# Only integration tests
 make test-integration
 ```
 
-### Método 4: Docker
+### Method 4: Docker
 
 ```bash
-# Executar testes no container
+# Run tests in container
 docker-compose run --rm ingest poetry run pytest
 
-# Com cobertura
+# With coverage
 docker-compose run --rm ingest poetry run pytest --cov
 
-# Usando make
+# Using make
 make docker-test
 ```
 
 ---
 
-## 📈 Cobertura de Código
+## 📈 Code Coverage
 
-### Gerar Relatório
+### Generate Report
 
 ```bash
 # Terminal
 poetry run pytest --cov --cov-report=term-missing
 
-# HTML (abre no navegador)
+# HTML (opens in browser)
 poetry run pytest --cov --cov-report=html
 open htmlcov/index.html
 
-# XML (para CI/CD)
+# XML (for CI/CD)
 poetry run pytest --cov --cov-report=xml
 ```
 
-### Meta de Cobertura
+### Coverage Goals
 
 - **Core**: 90%+
 - **Ingest**: 85%+
@@ -193,16 +193,16 @@ poetry run pytest --cov --cov-report=xml
 
 ---
 
-## 🎯 Tipos de Testes
+## 🎯 Test Types
 
-### Testes Unitários (`@pytest.mark.unit`)
+### Unit Tests (`@pytest.mark.unit`)
 
-- Testam componentes isolados
-- Usam mocks para dependências externas
-- Rápidos de executar (<1s por teste)
-- Não requerem serviços externos
+- Test isolated components
+- Use mocks for external dependencies
+- Fast to run (<1s per test)
+- Don't require external services
 
-**Exemplo:**
+**Example:**
 ```python
 @pytest.mark.unit
 def test_generate(mock_openai_client):
@@ -211,46 +211,46 @@ def test_generate(mock_openai_client):
     assert result == "Generated text"
 ```
 
-### Testes de Integração (`@pytest.mark.integration`)
+### Integration Tests (`@pytest.mark.integration`)
 
-- Testam interação entre componentes
-- Podem usar serviços reais (Qdrant, etc.)
-- Mais lentos
-- Ideais para CI/CD pipeline
+- Test interaction between components
+- May use real services (Qdrant, etc.)
+- Slower
+- Ideal for CI/CD pipeline
 
-**Exemplo:**
+**Example:**
 ```python
 @pytest.mark.integration
 def test_end_to_end_query():
-    # Usa Qdrant real, OpenAI real
+    # Uses real Qdrant, real OpenAI
     response = client.post("/query", json={"query": "test"})
     assert response.status_code == 200
 ```
 
-### Testes Lentos (`@pytest.mark.slow`)
+### Slow Tests (`@pytest.mark.slow`)
 
-- Testes que demoram >5s
-- Geralmente testes de integração ou end-to-end
-- Podem ser pulados em desenvolvimento rápido
+- Tests that take >5s
+- Usually integration or end-to-end tests
+- Can be skipped during rapid development
 
 ```bash
-# Pular testes lentos
+# Skip slow tests
 poetry run pytest -m "not slow"
 ```
 
 ---
 
-## 🔧 Fixtures Disponíveis
+## 🔧 Available Fixtures
 
 ### Mock Clients
 
 ```python
 def test_with_openai(mock_openai_client):
-    """mock_openai_client já configurado com respostas fake"""
+    """mock_openai_client already configured with fake responses"""
     pass
 
 def test_with_qdrant(mock_qdrant_client):
-    """mock_qdrant_client já configurado com resultados fake"""
+    """mock_qdrant_client already configured with fake results"""
     pass
 ```
 
@@ -258,22 +258,22 @@ def test_with_qdrant(mock_qdrant_client):
 
 ```python
 def test_chunking(sample_text):
-    """sample_text contém texto de exemplo"""
+    """sample_text contains sample text"""
     chunks = semantic_chunk(sample_text)
     assert len(chunks) > 0
 
 def test_embeddings(sample_chunks):
-    """sample_chunks contém lista de chunks"""
+    """sample_chunks contains list of chunks"""
     pass
 
 def test_search(sample_search_results):
-    """sample_search_results contém resultados de busca mock"""
+    """sample_search_results contains mock search results"""
     pass
 ```
 
 ---
 
-## 🧩 Boas Práticas Implementadas
+## 🧩 Best Practices Implemented
 
 ### 1. Arrange-Act-Assert (AAA)
 
@@ -292,52 +292,52 @@ def test_example():
 ### 2. Descriptive Test Names
 
 ```python
-# ✅ Bom
+# ✅ Good
 def test_generate_with_invalid_api_key_raises_error():
     pass
 
-# ❌ Ruim
+# ❌ Bad
 def test_generate_error():
     pass
 ```
 
-### 3. One Assert Per Test (quando possível)
+### 3. One Assert Per Test (when possible)
 
 ```python
-# ✅ Bom
+# ✅ Good
 def test_response_has_answer():
     assert "answer" in response.json()
 
 def test_response_has_sources():
     assert "sources" in response.json()
 
-# ❌ Evitar múltiplos asserts não relacionados
+# ❌ Avoid multiple unrelated asserts
 def test_response():
     assert "answer" in response.json()
     assert "sources" in response.json()
     assert response.status_code == 200
 ```
 
-### 4. Usar Mocks para APIs Externas
+### 4. Use Mocks for External APIs
 
 ```python
-# ✅ Sempre use mocks para OpenAI, Qdrant em testes unitários
+# ✅ Always use mocks for OpenAI, Qdrant in unit tests
 @patch('ingest.embeddings.openai.OpenAI')
 def test_embed_texts(mock_openai):
-    # Teste rápido, sem custo de API
+    # Fast test, no API cost
     pass
 
-# ❌ Nunca faça chamadas reais em testes unitários
+# ❌ Never make real calls in unit tests
 def test_embed_texts_real():
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    # Isso é lento e custa dinheiro!
+    # This is slow and costs money!
 ```
 
-### 5. Organize em Classes
+### 5. Organize in Classes
 
 ```python
 class TestOpenAILLM:
-    """Agrupa todos os testes relacionados ao OpenAILLM"""
+    """Groups all tests related to OpenAILLM"""
     
     def test_initialization(self):
         pass
@@ -356,32 +356,32 @@ class TestOpenAILLM:
 ### Import Errors
 
 ```bash
-# Adicionar PYTHONPATH
+# Add to PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 poetry run pytest
 ```
 
-### Testes Falhando Localmente mas Passando no CI
+### Tests Failing Locally but Passing in CI
 
-- Verifique variáveis de ambiente (`.env` vs CI secrets)
-- Verifique dependências (versões diferentes?)
-- Verifique sistema operacional (paths, line endings)
+- Check environment variables (`.env` vs CI secrets)
+- Check dependencies (different versions?)
+- Check operating system (paths, line endings)
 
-### Mock não está funcionando
+### Mock Not Working
 
 ```python
-# ❌ Ruim: mock no lugar errado
-@patch('core.llm.openai.OpenAI')  # Importação original
+# ❌ Bad: mock in wrong place
+@patch('core.llm.openai.OpenAI')  # Original import
 
-# ✅ Bom: mock onde é usado
-@patch('tests.test_core.test_llm.OpenAI')  # Onde o teste importa
+# ✅ Good: mock where it's used
+@patch('tests.test_core.test_llm.OpenAI')  # Where test imports
 ```
 
-### Testes muito lentos
+### Tests Too Slow
 
-- Use `-n auto` para paralelização: `pytest -n auto`
-- Pule testes lentos: `pytest -m "not slow"`
-- Verifique se está usando mocks corretamente
+- Use `-n auto` for parallelization: `pytest -n auto`
+- Skip slow tests: `pytest -m "not slow"`
+- Check if you're using mocks correctly
 
 ---
 
@@ -389,59 +389,58 @@ poetry run pytest
 
 ### GitHub Actions
 
-Os testes rodam automaticamente em cada push/PR.
+Tests run automatically on each push/PR.
 
 **Workflow**: `.github/workflows/tests.yml`
 
-- ✅ Executa em Python 3.12
-- ✅ Sobe Qdrant como service
-- ✅ Executa todos os testes
-- ✅ Gera relatório de cobertura
-- ✅ Upload para Codecov (opcional)
+- ✅ Runs on Python 3.12
+- ✅ Starts Qdrant as service
+- ✅ Runs all tests
+- ✅ Generates coverage report
+- ✅ Upload to Codecov (optional)
 - ✅ Linting (flake8, black, isort)
 
-### Badges (adicione ao README.md)
+### Badges (add to README.md)
 
 ```markdown
-![Tests](https://github.com/seu-usuario/contexta/workflows/Tests/badge.svg)
-[![codecov](https://codecov.io/gh/seu-usuario/contexta/branch/main/graph/badge.svg)](https://codecov.io/gh/seu-usuario/contexta)
+![Tests](https://github.com/your-user/contexta/workflows/Tests/badge.svg)
+[![codecov](https://codecov.io/gh/your-user/contexta/branch/main/graph/badge.svg)](https://codecov.io/gh/your-user/contexta)
 ```
 
 ---
 
-## 📚 Recursos Adicionais
+## 📚 Additional Resources
 
-### Documentação Pytest
+### Pytest Documentation
 
 - [pytest docs](https://docs.pytest.org/)
 - [pytest-cov](https://pytest-cov.readthedocs.io/)
 - [pytest-mock](https://pytest-mock.readthedocs.io/)
 
-### Próximos Passos
+### Next Steps
 
-- [ ] Adicionar testes end-to-end completos
-- [ ] Adicionar testes de performance
-- [ ] Adicionar testes de carga (locust, k6)
-- [ ] Configurar Codecov para relatórios de cobertura
-- [ ] Adicionar mutation testing (mutmut)
-- [ ] Adicionar property-based testing (hypothesis)
+- [ ] Add complete end-to-end tests
+- [ ] Add performance tests
+- [ ] Add load tests (locust, k6)
+- [ ] Configure Codecov for coverage reports
+- [ ] Add mutation testing (mutmut)
+- [ ] Add property-based testing (hypothesis)
 
 ---
 
-## ✅ Checklist de Testes
+## ✅ Testing Checklist
 
-Antes de fazer PR, garanta que:
+Before making a PR, ensure:
 
-- [ ] Todos os testes passam: `./run_tests.sh`
-- [ ] Cobertura >85%: `./run_tests.sh cov`
+- [ ] All tests pass: `./run_tests.sh`
+- [ ] Coverage >85%: `./run_tests.sh cov`
 - [ ] Linting ok: `make lint`
-- [ ] Formatação ok: `make format`
-- [ ] Novos testes foram adicionados para novas features
-- [ ] Testes usam mocks apropriados
-- [ ] Testes têm nomes descritivos
-- [ ] Documentação atualizada se necessário
+- [ ] Formatting ok: `make format`
+- [ ] New tests added for new features
+- [ ] Tests use appropriate mocks
+- [ ] Tests have descriptive names
+- [ ] Documentation updated if necessary
 
 ---
 
-**🎉 Pronto! Agora você tem uma suíte de testes profissional para o Contexta!**
-
+**🎉 Ready! You now have a professional test suite for Contexta!**

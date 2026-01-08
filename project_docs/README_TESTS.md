@@ -1,77 +1,77 @@
-# Testes - Contexta
+# Tests - Contexta
 
-## Estrutura de Testes
+## Test Structure
 
 ```
 tests/
-├── conftest.py              # Fixtures compartilhadas
-├── test_core/              # Testes do core
+├── conftest.py              # Shared fixtures
+├── test_core/              # Core tests
 │   ├── test_llm.py
 │   ├── test_prompts.py
 │   └── test_reranker.py
-├── test_ingest/            # Testes do ingest
+├── test_ingest/            # Ingest service tests
 │   ├── test_chunking.py
 │   ├── test_loaders.py
 │   ├── test_embeddings.py
 │   └── test_vectorstore.py
-└── test_api/               # Testes da API
+└── test_api/               # API tests
     └── test_main.py
 ```
 
-## Executar Testes
+## Running Tests
 
-### Todos os testes
+### All tests
 ```bash
 pytest
 ```
 
-### Com cobertura
+### With coverage
 ```bash
 pytest --cov
 ```
 
-### Testes específicos
+### Specific tests
 ```bash
-# Por módulo
+# By module
 pytest tests/test_core/
 
-# Por arquivo
+# By file
 pytest tests/test_core/test_llm.py
 
-# Por classe
+# By class
 pytest tests/test_core/test_llm.py::TestOpenAILLM
 
-# Por função
+# By function
 pytest tests/test_core/test_llm.py::TestOpenAILLM::test_generate
 ```
 
-### Com verbosidade
+### With verbosity
 ```bash
 pytest -v
-pytest -vv  # Mais verbose
+pytest -vv  # More verbose
 ```
 
-### Parar no primeiro erro
+### Stop on first error
 ```bash
 pytest -x
 ```
 
-### Ver print statements
+### Show print statements
 ```bash
 pytest -s
 ```
 
-## Executar no Docker
+## Running in Docker
 
-### Rodar testes em container
+### Run tests in container
 ```bash
 docker-compose run --rm ingest pytest
 
-# Ou criar serviço específico de testes
+# Or create a specific test service
 docker-compose run --rm -e PYTHONPATH=/app test pytest
 ```
 
-### Adicionar ao docker-compose.yml (opcional)
+### Add to docker-compose.yml (optional)
 ```yaml
 test:
   build: .
@@ -83,54 +83,54 @@ test:
     - QDRANT_URL=http://qdrant:6333
 ```
 
-Depois rodar:
+Then run:
 ```bash
 docker-compose run --rm test
 ```
 
-## Cobertura
+## Coverage
 
-### Gerar relatório HTML
+### Generate HTML report
 ```bash
 pytest --cov --cov-report=html
 ```
 
-Depois abra `htmlcov/index.html` no navegador.
+Then open `htmlcov/index.html` in your browser.
 
-### Gerar relatório XML (para CI/CD)
+### Generate XML report (for CI/CD)
 ```bash
 pytest --cov --cov-report=xml
 ```
 
-## Fixtures Disponíveis
+## Available Fixtures
 
-Veja `tests/conftest.py` para fixtures compartilhadas:
+See `tests/conftest.py` for shared fixtures:
 
-- `mock_openai_client`: Mock do cliente OpenAI
-- `mock_qdrant_client`: Mock do cliente Qdrant
-- `sample_text`: Texto de exemplo
-- `sample_chunks`: Chunks de exemplo
-- `sample_embeddings`: Embeddings de exemplo
-- `sample_search_results`: Resultados de busca de exemplo
+- `mock_openai_client`: Mock OpenAI client
+- `mock_qdrant_client`: Mock Qdrant client
+- `sample_text`: Sample text
+- `sample_chunks`: Sample chunks
+- `sample_embeddings`: Sample embeddings
+- `sample_search_results`: Sample search results
 
 ## Markers
 
 ```bash
-# Rodar apenas testes unitários
+# Run only unit tests
 pytest -m unit
 
-# Rodar apenas testes de integração
+# Run only integration tests
 pytest -m integration
 
-# Pular testes lentos
+# Skip slow tests
 pytest -m "not slow"
 ```
 
 ## CI/CD
 
-### GitHub Actions (exemplo)
+### GitHub Actions (example)
 
-Crie `.github/workflows/tests.yml`:
+Create `.github/workflows/tests.yml`:
 
 ```yaml
 name: Tests
@@ -153,7 +153,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       
       - name: Install dependencies
         run: |
@@ -171,43 +171,43 @@ jobs:
         uses: codecov/codecov-action@v3
 ```
 
-## Boas Práticas
+## Best Practices
 
-1. **Sempre use mocks** para APIs externas (OpenAI, Qdrant)
-2. **Teste casos extremos**: vazio, None, valores grandes
-3. **Teste erros**: verifique que exceções são lançadas corretamente
-4. **Mantenha testes rápidos**: use mocks ao invés de serviços reais
-5. **Um assert por teste** (quando possível)
-6. **Nomes descritivos**: `test_generate_with_invalid_api_key`
-7. **Organize em classes**: agrupe testes relacionados
+1. **Always use mocks** for external APIs (OpenAI, Qdrant)
+2. **Test edge cases**: empty, None, large values
+3. **Test errors**: verify exceptions are raised correctly
+4. **Keep tests fast**: use mocks instead of real services
+5. **One assert per test** (when possible)
+6. **Descriptive names**: `test_generate_with_invalid_api_key`
+7. **Organize in classes**: group related tests
 
-## Exemplo de Teste Completo
+## Example Complete Test
 
 ```python
 import pytest
 from unittest.mock import Mock, patch
 
 class TestMyFeature:
-    \"\"\"Tests for my feature.\"\"\"
+    """Tests for my feature."""
     
     @pytest.fixture
     def my_fixture(self):
-        \"\"\"Setup for tests.\"\"\"
+        """Setup for tests."""
         return {"key": "value"}
     
     def test_basic_functionality(self, my_fixture):
-        \"\"\"Test basic case.\"\"\"
+        """Test basic case."""
         result = my_function(my_fixture)
         assert result == expected_value
     
     def test_error_handling(self):
-        \"\"\"Test error case.\"\"\"
+        """Test error case."""
         with pytest.raises(ValueError):
             my_function(invalid_input)
     
     @patch('module.external_api')
     def test_with_mock(self, mock_api):
-        \"\"\"Test with mocked external dependency.\"\"\"
+        """Test with mocked external dependency."""
         mock_api.return_value = "mocked"
         result = my_function()
         assert result == "expected"
@@ -218,27 +218,30 @@ class TestMyFeature:
 
 ### Import errors
 ```bash
-# Adicionar ao PYTHONPATH
+# Add to PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 pytest
 ```
 
-### Testes muito lentos
-- Use mocks para APIs externas
-- Marque testes lentos com `@pytest.mark.slow`
-- Execute testes lentos separadamente
+### Tests too slow
+- Use mocks for external APIs
+- Mark slow tests with `@pytest.mark.slow`
+- Run slow tests separately
 
-### Cobertura baixa
+### Low coverage
 ```bash
-# Ver quais linhas não foram cobertas
+# See which lines aren't covered
 pytest --cov --cov-report=term-missing
 ```
 
-## Próximos Passos
+## Next Steps
 
-- [ ] Adicionar testes de integração end-to-end
-- [ ] Configurar CI/CD no GitHub Actions
-- [ ] Aumentar cobertura para >90%
-- [ ] Adicionar testes de performance
-- [ ] Adicionar testes de carga (stress tests)
+- [ ] Add end-to-end integration tests
+- [ ] Configure CI/CD on GitHub Actions
+- [ ] Increase coverage to >90%
+- [ ] Add performance tests
+- [ ] Add load tests (stress tests)
 
+---
+
+**For more detailed testing guide, see [TESTING_GUIDE.md](TESTING_GUIDE.md)**

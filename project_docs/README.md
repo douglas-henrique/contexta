@@ -1,93 +1,93 @@
-# 📚 Documentação do Projeto Contexta
+# 📚 Contexta Project Documentation
 
-Bem-vindo à documentação completa do Contexta, uma aplicação RAG (Retrieval-Augmented Generation) SaaS de nível profissional.
+Welcome to the complete documentation for Contexta, a professional-grade RAG (Retrieval-Augmented Generation) SaaS application.
 
-## 📖 Índice de Documentação
+## 📖 Documentation Index
 
-### 🚀 Guias de Setup
+### 🚀 Setup Guides
 
-- **[DOCKER_README.md](./DOCKER_README.md)** - Guia completo de Docker e containerização
-  - Como rodar o projeto com Docker Compose
-  - Configuração de ambiente
-  - Troubleshooting de containers
-  - Comandos úteis e Makefile
+- **[DOCKER_README.md](./DOCKER_README.md)** - Complete Docker and containerization guide
+  - How to run the project with Docker Compose
+  - Environment configuration
+  - Container troubleshooting
+  - Useful commands and Makefile
 
-### 🧪 Guias de Testes
+### 🧪 Testing Guides
 
-- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Guia visual completo de testes
-  - Estrutura de testes
-  - Como executar testes
-  - Boas práticas
-  - CI/CD e cobertura
+- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Complete visual testing guide
+  - Test structure
+  - How to run tests
+  - Best practices
+  - CI/CD and coverage
   - Troubleshooting
 
-- **[README_TESTS.md](./README_TESTS.md)** - Documentação detalhada de testes
-  - Fixtures disponíveis
-  - Exemplos de testes
-  - Configuração de pytest
-  - Integração com GitHub Actions
+- **[README_TESTS.md](./README_TESTS.md)** - Detailed test documentation
+  - Available fixtures
+  - Test examples
+  - Pytest configuration
+  - GitHub Actions integration
 
-### 📐 Arquitetura e Princípios
+### 📐 Architecture and Principles
 
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Arquitetura do sistema (em construção)
-  - Visão geral da arquitetura
-  - Separação de responsabilidades
-  - Fluxo de dados
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture
+  - Architecture overview
+  - Separation of responsibilities
+  - Data flows
   - Multi-tenancy
 
-### 🔧 Guias de Desenvolvimento
+### 🔧 Development Guides
 
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Como contribuir (em construção)
-  - Guia de estilo
-  - Processo de PR
-  - Convenções de código
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute (under construction)
+  - Style guide
+  - PR process
+  - Code conventions
 
 ---
 
-## 🗂️ Estrutura da Documentação
+## 🗂️ Documentation Structure
 
 ```
 project_docs/
-├── README.md                    # Este arquivo (índice)
-├── DOCKER_README.md            # Docker e containerização
-├── TESTING_GUIDE.md            # Guia visual de testes
-├── README_TESTS.md             # Documentação detalhada de testes
-├── ARCHITECTURE.md             # Arquitetura do sistema (futuro)
-└── CONTRIBUTING.md             # Guia de contribuição (futuro)
+├── README.md                    # This file (index)
+├── DOCKER_README.md            # Docker and containerization
+├── TESTING_GUIDE.md            # Visual testing guide
+├── README_TESTS.md             # Detailed test documentation
+├── ARCHITECTURE.md             # System architecture
+└── CONTRIBUTING.md             # Contribution guide (future)
 ```
 
 ---
 
-## 🔗 Links Rápidos
+## 🔗 Quick Links
 
-| Documentação | Descrição | Status |
+| Documentation | Description | Status |
 |-------------|-----------|--------|
-| [README.md](../README.md) | README principal (raiz) | ✅ |
-| [DOCKER_README.md](./DOCKER_README.md) | Setup com Docker | ✅ |
-| [TESTING_GUIDE.md](./TESTING_GUIDE.md) | Guia visual de testes | ✅ |
-| [README_TESTS.md](./README_TESTS.md) | Testes detalhados | ✅ |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Arquitetura | 🚧 |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | Contribuição | 🚧 |
+| [README.md](../README.md) | Main README (root) | ✅ |
+| [DOCKER_README.md](./DOCKER_README.md) | Docker setup | ✅ |
+| [TESTING_GUIDE.md](./TESTING_GUIDE.md) | Visual testing guide | ✅ |
+| [README_TESTS.md](./README_TESTS.md) | Detailed tests | ✅ |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Architecture | ✅ |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Contributing | 🚧 |
 
-**Legenda:** ✅ Completo | 🚧 Em construção | ❌ Não iniciado
+**Legend:** ✅ Complete | 🚧 Under construction | ❌ Not started
 
 ---
 
-## 📝 Convenções de Documentação
+## 📝 Documentation Conventions
 
-### Formato
-- Todos os arquivos em **Markdown** (.md)
-- Cabeçalhos claros e hierarquia lógica
-- Exemplos de código com syntax highlighting
-- Emojis para navegação visual (opcional mas encorajado)
+### Format
+- All files in **Markdown** (.md)
+- Clear headers and logical hierarchy
+- Code examples with syntax highlighting
+- Emojis for visual navigation (optional but encouraged)
 
-### Estrutura de Arquivo
+### File Structure
 ```markdown
-# Título Principal
+# Main Title
 
 Brief description
 
-## Table of Contents (para docs longos)
+## Table of Contents (for long docs)
 
 ## Section 1
 Content...
@@ -100,34 +100,33 @@ Content...
 ## Additional Resources
 ```
 
-### Atualização
-- Manter documentação sincronizada com código
-- Adicionar data de última atualização se relevante
-- Versionar mudanças importantes
+### Updates
+- Keep documentation synchronized with code
+- Add last update date if relevant
+- Version important changes
 
 ---
 
-## 🆘 Precisa de Ajuda?
+## 🆘 Need Help?
 
-1. **Leia o README principal** - [../README.md](../README.md)
-2. **Consulte a documentação específica** - Veja índice acima
-3. **Verifique issues do GitHub** - Problemas conhecidos
-4. **Abra uma issue** - Se não encontrar resposta
-
----
-
-## 🤝 Contribuindo para a Documentação
-
-Encontrou um erro ou quer melhorar a documentação?
-
-1. Edite o arquivo relevante
-2. Siga as convenções acima
-3. Teste os exemplos de código
-4. Abra um PR com descrição clara
-
-**Toda contribuição é bem-vinda! 🎉**
+1. **Read the main README** - [../README.md](../README.md)
+2. **Consult specific documentation** - See index above
+3. **Check GitHub issues** - Known problems
+4. **Open an issue** - If you can't find an answer
 
 ---
 
-**Última atualização:** Janeiro 2026
+## 🤝 Contributing to Documentation
 
+Found an error or want to improve the documentation?
+
+1. Edit the relevant file
+2. Follow the conventions above
+3. Test code examples
+4. Open a PR with clear description
+
+**All contributions are welcome! 🎉**
+
+---
+
+**Last updated:** January 2026

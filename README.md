@@ -218,28 +218,28 @@ This project follows:
 - **Error Handling**: Comprehensive logging and error handling throughout
 - **Type Safety**: Type hints required for all functions
 
-## Testes
+## Tests
 
-Contexta possui uma suíte completa de testes unitários e de integração.
+Contexta has a complete suite of unit and integration tests.
 
 ### Quick Start
 
 ```bash
-# Todos os testes
+# All tests
 ./run_tests.sh
 
-# Testes com cobertura
+# Tests with coverage
 ./run_tests.sh cov
 
-# Apenas testes unitários
+# Only unit tests
 ./run_tests.sh unit
 ```
 
-### Documentação Completa de Testes
+### Complete Testing Documentation
 
-📚 **[Guia Visual de Testes](project_docs/TESTING_GUIDE.md)** - Guia completo com estrutura, boas práticas, CI/CD e troubleshooting
+📚 **[Visual Testing Guide](project_docs/TESTING_GUIDE.md)** - Complete guide with structure, best practices, CI/CD and troubleshooting
 
-📖 **[Documentação Detalhada](project_docs/README_TESTS.md)** - Fixtures, exemplos, configuração e integração
+📖 **[Detailed Documentation](project_docs/README_TESTS.md)** - Fixtures, examples, configuration and integration
 
 ## Troubleshooting
 
@@ -247,7 +247,7 @@ Contexta possui uma suíte completa de testes unitários e de integração.
 
 - Verify Qdrant is running: `curl http://localhost:6333/health`
 - Check `QDRANT_URL` in `.env`
-- Se usando Docker: `docker-compose ps` para ver status dos containers
+- If using Docker: `docker-compose ps` to see container status
 
 ### OpenAI API Issues
 
@@ -262,43 +262,43 @@ Contexta possui uma suíte completa de testes unitários e de integração.
 - Check document format is supported (PDF, TXT)
 - Verify tenant_id is correct
 
-### Import Errors nos Testes
+### Import Errors in Tests
 
 ```bash
-# Adicionar ao PYTHONPATH
+# Add to PYTHONPATH
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 poetry run pytest
 ```
 
-### Dependências Desatualizadas
+### Outdated Dependencies
 
 ```bash
-# Atualizar poetry.lock
+# Update poetry.lock
 poetry lock
 
-# Reinstalar dependências
+# Reinstall dependencies
 poetry install --no-root
 ```
 
 ## Docker
 
-### Quick Start com Docker
+### Quick Start with Docker
 
 ```bash
-# Subir todos os serviços
+# Start all services
 make up
 
-# Ver logs
+# View logs
 make logs
 
-# Executar testes
+# Run tests
 make docker-test
 
-# Parar serviços
+# Stop services
 make down
 ```
 
-📚 **[Documentação Completa de Docker](project_docs/DOCKER_README.md)** - Guia detalhado de setup, troubleshooting e comandos Docker
+📚 **[Complete Docker Documentation](project_docs/DOCKER_README.md)** - Detailed guide on setup, troubleshooting and Docker commands
 
 ## License
 

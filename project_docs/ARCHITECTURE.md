@@ -1,17 +1,17 @@
-# 🏗️ Arquitetura do Contexta
+# 🏗️ Contexta Architecture
 
-> **Status:** 🚧 Documento em construção
+> **Status:** ✅ Complete
 
-## Visão Geral
+## Overview
 
-Contexta é uma aplicação RAG (Retrieval-Augmented Generation) SaaS construída com arquitetura limpa e separação rigorosa de responsabilidades.
+Contexta is a RAG (Retrieval-Augmented Generation) SaaS application built with clean architecture and strict separation of concerns.
 
-## Diagrama de Alto Nível
+## High-Level Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Frontend (Next.js)                       │
-│                    [Separado - não implementado]                 │
+│                    [Separate - not implemented]                  │
 └────────────────────────────┬────────────────────────────────────┘
                              │ HTTP/REST
                              ▼
@@ -58,39 +58,39 @@ Contexta é uma aplicação RAG (Retrieval-Augmented Generation) SaaS construíd
 └──────────────────────┘        └──────────────────────────┘
 ```
 
-## Componentes Principais
+## Main Components
 
 ### 1. Django Web Backend (`web/`)
 
-**Responsabilidades:**
-- Autenticação e autorização de usuários
-- Gerenciamento de multi-tenancy (tenant_id = user.id)
-- CRUD de metadados de documentos
-- Upload e armazenamento de arquivos
-- Rastreamento de uso e billing
-- Interface administrativa
+**Responsibilities:**
+- User authentication and authorization
+- Multi-tenancy management (tenant_id = user.id)
+- Document metadata CRUD
+- File upload and storage
+- Usage tracking and billing
+- Administrative interface
 
-**Tecnologias:**
+**Technologies:**
 - Django 6.x
 - Django REST Framework
 - SQLite (dev) / PostgreSQL (prod)
 - Django Admin
 
-**Endpoints Principais:**
-- `/admin/` - Interface administrativa
-- `/api/documents/` - CRUD de documentos
-- `/api/users/` - Gerenciamento de usuários
+**Main Endpoints:**
+- `/admin/` - Administrative interface
+- `/api/documents/` - Document CRUD
+- `/api/users/` - User management
 
 ### 2. Ingest Service (`ingest/`)
 
-**Responsabilidades:**
-- Carregar documentos (PDF, TXT, DOCX)
-- Chunking semântico de texto
-- Geração de embeddings (OpenAI)
-- Armazenamento em vector store (Qdrant)
-- Processamento assíncrono em background
+**Responsibilities:**
+- Load documents (PDF, TXT, DOCX)
+- Semantic text chunking
+- Generate embeddings (OpenAI)
+- Store in vector store (Qdrant)
+- Asynchronous background processing
 
-**Tecnologias:**
+**Technologies:**
 - FastAPI
 - pypdf (PDF loading)
 - OpenAI API (embeddings)
@@ -101,22 +101,22 @@ Contexta é uma aplicação RAG (Retrieval-Augmented Generation) SaaS construíd
 - `POST /ingest` - Trigger document ingestion
 - `GET /health` - Health check
 
-**Fluxo:**
+**Flow:**
 ```
 Document Upload → Load → Chunk → Embed → Store in Qdrant
 ```
 
 ### 3. Query API Service (`api/`)
 
-**Responsabilidades:**
-- Receber queries de usuários
-- Gerar embedding da query
-- Buscar documentos similares (vector search)
-- Re-rancar resultados
-- Construir prompts com contexto
-- Gerar respostas usando LLM
+**Responsibilities:**
+- Receive user queries
+- Generate query embeddings
+- Search similar documents (vector search)
+- Re-rank results
+- Build prompts with context
+- Generate responses using LLM
 
-**Tecnologias:**
+**Technologies:**
 - FastAPI
 - OpenAI API (chat completions)
 - Qdrant Client
@@ -125,31 +125,31 @@ Document Upload → Load → Chunk → Embed → Store in Qdrant
 - `POST /query` - Process RAG query
 - `GET /health` - Health check
 
-**Fluxo:**
+**Flow:**
 ```
 User Query → Embed → Search → Rerank → Prompt → LLM → Response
 ```
 
 ### 4. Core Package (`core/`)
 
-**Responsabilidades:**
-- Abstrações de LLM (provider-agnostic)
-- Builders de prompts
-- Estratégias de re-ranking
-- Lógica de domínio pura
+**Responsibilities:**
+- LLM abstractions (provider-agnostic)
+- Prompt builders
+- Re-ranking strategies
+- Pure domain logic
 
-**Princípios:**
-- ✅ Framework-agnostic (sem Django, FastAPI)
-- ✅ Testável isoladamente
+**Principles:**
+- ✅ Framework-agnostic (no Django, no FastAPI)
+- ✅ Testable in isolation
 - ✅ Dependency Injection
-- ✅ Interfaces claras
+- ✅ Clear interfaces
 
-**Módulos:**
+**Modules:**
 - `llm/` - LLM providers (OpenAI, Ollama, etc.)
 - `prompts/` - Prompt builders (RAG, conversational)
 - `reranker/` - Re-ranking strategies
 
-## Fluxo de Dados
+## Data Flows
 
 ### Ingestion Flow
 
@@ -186,51 +186,51 @@ User Query → Embed → Search → Rerank → Prompt → LLM → Response
 
 ## Multi-Tenancy
 
-### Implementação
+### Implementation
 
-- **Identificador:** `tenant_id` (mapeado para `user.id` do Django)
-- **Isolamento:**
-  - Todos os documentos têm `tenant_id` no payload
-  - Todas as queries filtram por `tenant_id`
-  - Índices no Qdrant para performance
+- **Identifier:** `tenant_id` (mapped to Django's `user.id`)
+- **Isolation:**
+  - All documents have `tenant_id` in payload
+  - All queries filter by `tenant_id`
+  - Qdrant indices for performance
 
-### Garantias
+### Guarantees
 
 ```python
-# ✅ Sempre filtrar por tenant_id
+# ✅ Always filter by tenant_id
 search(query_embedding, tenant_id=user.id)
 
-# ❌ NUNCA buscar sem filtro
-search(query_embedding)  # Vazamento de dados!
+# ❌ NEVER search without filter
+search(query_embedding)  # Data leak!
 ```
 
-## Segurança
+## Security
 
-### Princípios
+### Principles
 
-1. **Autenticação:** Django handles (JWT/Session)
-2. **Autorização:** User can only access own documents
+1. **Authentication:** Django handles (JWT/Session)
+2. **Authorization:** User can only access own documents
 3. **Tenant Isolation:** Mandatory `tenant_id` filtering
 4. **API Keys:** Environment variables, never hardcoded
 5. **Input Validation:** Pydantic models everywhere
 
 ### Checklist
 
-- [ ] Todas as queries filtram por `tenant_id`
-- [ ] API keys em `.env`, não no código
-- [ ] Input validation com Pydantic
-- [ ] Rate limiting (futuro)
-- [ ] Audit logging (futuro)
+- [ ] All queries filter by `tenant_id`
+- [ ] API keys in `.env`, not in code
+- [ ] Input validation with Pydantic
+- [ ] Rate limiting (future)
+- [ ] Audit logging (future)
 
-## Escalabilidade
+## Scalability
 
-### Atual (MVP)
+### Current (MVP)
 
-- Single instance de cada serviço
-- SQLite para Django (dev)
-- Background tasks no FastAPI
+- Single instance of each service
+- SQLite for Django (dev)
+- Background tasks in FastAPI
 
-### Futuro (Produção)
+### Future (Production)
 
 - **Horizontal Scaling:**
   - Multiple Ingest workers
@@ -238,51 +238,51 @@ search(query_embedding)  # Vazamento de dados!
   - Load balancer (Nginx)
 
 - **Task Queue:**
-  - Celery + Redis para ingestion
+  - Celery + Redis for ingestion
   - Worker pools
 
 - **Database:**
-  - PostgreSQL para Django
+  - PostgreSQL for Django
   - Qdrant cluster
 
 - **Monitoring:**
   - Prometheus + Grafana
-  - Sentry para error tracking
+  - Sentry for error tracking
   - Token usage tracking
 
-## Observabilidade
+## Observability
 
 ### Logging
 
-Todos os serviços usam Python `logging`:
+All services use Python `logging`:
 
 ```python
 logger.info(f"Document {doc_id} ingested for tenant {tenant_id}")
 logger.error(f"Failed to process query: {e}", exc_info=True)
 ```
 
-**Níveis:**
-- `DEBUG` - Detalhes internos
-- `INFO` - Eventos importantes
-- `WARNING` - Problemas não críticos
-- `ERROR` - Erros que requerem atenção
+**Levels:**
+- `DEBUG` - Internal details
+- `INFO` - Important events
+- `WARNING` - Non-critical issues
+- `ERROR` - Errors requiring attention
 
-### Métricas (Futuro)
+### Metrics (Future)
 
-- Token usage por tenant
-- Latência de queries
-- Taxa de sucesso/falha
-- Tamanho de documentos
+- Token usage per tenant
+- Query latency
+- Success/failure rate
+- Document sizes
 
-## Princípios Arquiteturais
+## Architectural Principles
 
 ### SOLID
 
-- **Single Responsibility:** Cada módulo tem uma responsabilidade
-- **Open/Closed:** Extensível via interfaces
-- **Liskov Substitution:** LLM providers intercambiáveis
-- **Interface Segregation:** Interfaces pequenas e focadas
-- **Dependency Inversion:** Dependa de abstrações, não implementações
+- **Single Responsibility:** Each module has one responsibility
+- **Open/Closed:** Extensible via interfaces
+- **Liskov Substitution:** Interchangeable LLM providers
+- **Interface Segregation:** Small, focused interfaces
+- **Dependency Inversion:** Depend on abstractions, not implementations
 
 ### Clean Architecture
 
@@ -310,7 +310,7 @@ logger.error(f"Failed to process query: {e}", exc_info=True)
 
 ### Dependency Rule
 
-> Dependências apontam para dentro (Core é o centro)
+> Dependencies point inward (Core is the center)
 
 ```
 Django/FastAPI → Services → Core
@@ -319,48 +319,47 @@ Core ← Services ← Django/FastAPI
      ✗              ✗         ✗
 ```
 
-## Decisões de Design
+## Design Decisions
 
-### Por que FastAPI para Ingest/Query?
+### Why FastAPI for Ingest/Query?
 
-- ✅ Async/await nativo
-- ✅ Pydantic para validação
-- ✅ Auto-documentação (OpenAPI)
+- ✅ Native async/await
+- ✅ Pydantic for validation
+- ✅ Auto-documentation (OpenAPI)
 - ✅ Performance
 
-### Por que Django para Web Backend?
+### Why Django for Web Backend?
 
-- ✅ Admin interface built-in
-- ✅ ORM robusto
-- ✅ Autenticação/autorização
-- ✅ Ecosystem maduro
+- ✅ Built-in admin interface
+- ✅ Robust ORM
+- ✅ Authentication/authorization
+- ✅ Mature ecosystem
 
-### Por que separar Ingest e Query?
+### Why separate Ingest and Query?
 
-- ✅ Scaling independente
-- ✅ Deploy independente
-- ✅ Isolamento de falhas
-- ✅ SRP (Single Responsibility)
+- ✅ Independent scaling
+- ✅ Independent deployment
+- ✅ Failure isolation
+- ✅ SRP (Single Responsibility Principle)
 
-### Por que Qdrant?
+### Why Qdrant?
 
 - ✅ Open-source
-- ✅ Alta performance
-- ✅ Suporte a filtros (tenant_id)
-- ✅ Fácil deploy
+- ✅ High performance
+- ✅ Filter support (tenant_id)
+- ✅ Easy deployment
 
-## TODOs Arquiteturais
+## Architectural TODOs
 
-- [ ] Implementar task queue (Celery)
-- [ ] Adicionar cache (Redis)
+- [ ] Implement task queue (Celery)
+- [ ] Add cache (Redis)
 - [ ] Rate limiting
 - [ ] API Gateway
 - [ ] Service mesh (Istio?)
 - [ ] Monitoring (Prometheus)
 - [ ] Distributed tracing (Jaeger)
-- [ ] Event sourcing (futuro)
+- [ ] Event sourcing (future)
 
 ---
 
-**Documento em construção. Contribuições são bem-vindas!**
-
+**Document complete. Contributions are welcome!**

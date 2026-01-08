@@ -1,38 +1,38 @@
-# Rodando Contexta com Docker
+# Running Contexta with Docker
 
-## Pré-requisitos
+## Prerequisites
 
-- Docker Desktop instalado e rodando
+- Docker Desktop installed and running
 - Docker Compose v2+
 - OpenAI API key
 
-## Setup Rápido
+## Quick Setup
 
-### 1. Configure as variáveis de ambiente
+### 1. Configure environment variables
 
 ```bash
-# Copie o arquivo de exemplo
+# Copy the example file
 cp .env.docker .env
 
-# Edite o .env e adicione sua OPENAI_API_KEY
-nano .env  # ou vim, code, etc.
+# Edit .env and add your OPENAI_API_KEY
+nano .env  # or vim, code, etc.
 ```
 
-### 2. Rode todo o projeto com um único comando
+### 2. Run the entire project with a single command
 
 ```bash
 docker-compose up
 ```
 
-Ou, para rodar em background:
+Or, to run in the background:
 
 ```bash
 docker-compose up -d
 ```
 
-## Serviços Disponíveis
+## Available Services
 
-Após iniciar, você terá acesso a:
+After starting, you'll have access to:
 
 - **Django Admin**: http://localhost:8000/admin
 - **Django API**: http://localhost:8000/api/documents/
@@ -40,14 +40,14 @@ Após iniciar, você terá acesso a:
 - **Query API**: http://localhost:8002
 - **Qdrant Dashboard**: http://localhost:6333/dashboard
 
-## Comandos Úteis
+## Useful Commands
 
-### Ver logs de todos os serviços
+### View logs from all services
 ```bash
 docker-compose logs -f
 ```
 
-### Ver logs de um serviço específico
+### View logs from a specific service
 ```bash
 docker-compose logs -f django
 docker-compose logs -f ingest
@@ -55,75 +55,75 @@ docker-compose logs -f api
 docker-compose logs -f qdrant
 ```
 
-### Parar todos os serviços
+### Stop all services
 ```bash
 docker-compose down
 ```
 
-### Parar e remover volumes (limpar tudo)
+### Stop and remove volumes (clean everything)
 ```bash
 docker-compose down -v
 ```
 
-### Reconstruir as imagens
+### Rebuild images
 ```bash
 docker-compose build
 docker-compose up
 ```
 
-### Executar comandos dentro dos containers
+### Execute commands inside containers
 
 ```bash
-# Django - criar superusuário
+# Django - create superuser
 docker-compose exec django python web/manage.py createsuperuser
 
-# Django - executar migrações
+# Django - run migrations
 docker-compose exec django python web/manage.py migrate
 
-# Django - criar migrações
+# Django - create migrations
 docker-compose exec django python web/manage.py makemigrations
 
 # Django - shell
 docker-compose exec django python web/manage.py shell
 
-# Ver logs do Qdrant
+# View Qdrant logs
 docker-compose logs qdrant
 ```
 
-## Primeira Execução
+## First Run
 
-Na primeira vez que rodar, você precisará criar um superusuário:
+On the first run, you'll need to create a superuser:
 
 ```bash
-# Inicie os serviços
+# Start services
 docker-compose up -d
 
-# Aguarde alguns segundos para os serviços iniciarem
+# Wait a few seconds for services to start
 
-# Crie o superusuário
+# Create superuser
 docker-compose exec django python web/manage.py createsuperuser
 
-# Siga as instruções e crie seu usuário
+# Follow the instructions and create your user
 ```
 
-## Testando o Sistema
+## Testing the System
 
-### 1. Acesse o Django Admin
+### 1. Access Django Admin
 - URL: http://localhost:8000/admin
-- Login com o superusuário criado
+- Login with the created superuser
 
-### 2. Faça upload de um documento
-- No admin, vá em "Documents"
-- Clique em "Add Document"
-- Faça upload de um PDF
-- O documento será processado automaticamente pelo Ingest Service
+### 2. Upload a document
+- In admin, go to "Documents"
+- Click "Add Document"
+- Upload a PDF
+- The document will be automatically processed by the Ingest Service
 
-### 3. Consulte os documentos
+### 3. Query documents
 ```bash
 curl -X POST http://localhost:8002/query \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "Qual é o tema principal?",
+    "query": "What is the main topic?",
     "tenant_id": 1,
     "top_k": 10,
     "rerank_top_k": 5
@@ -132,7 +132,7 @@ curl -X POST http://localhost:8002/query \
 
 ## Health Checks
 
-Verifique se todos os serviços estão saudáveis:
+Check if all services are healthy:
 
 ```bash
 # Qdrant
@@ -148,72 +148,72 @@ curl http://localhost:8001/health
 curl http://localhost:8002/health
 ```
 
-## Desenvolvimento
+## Development
 
-Para desenvolvimento com hot-reload:
+For development with hot-reload:
 
 ```bash
-# Os volumes estão mapeados, então mudanças no código
-# são refletidas automaticamente (hot-reload ativo)
+# Volumes are mapped, so code changes
+# are automatically reflected (hot-reload active)
 
 docker-compose up
 ```
 
 ## Troubleshooting
 
-### Serviço não inicia
+### Service doesn't start
 ```bash
-# Veja os logs
-docker-compose logs <nome-do-servico>
+# View logs
+docker-compose logs <service-name>
 
-# Reconstrua a imagem
-docker-compose build <nome-do-servico>
-docker-compose up <nome-do-servico>
+# Rebuild the image
+docker-compose build <service-name>
+docker-compose up <service-name>
 ```
 
-### Banco de dados corrompido
+### Corrupted database
 ```bash
-# Remova o volume do Django
+# Remove Django volume
 docker-compose down -v
 docker-compose up
 ```
 
-### Qdrant não inicia
+### Qdrant doesn't start
 ```bash
-# Remova o volume do Qdrant
+# Remove Qdrant volume
 docker-compose down
 docker volume rm contexta_qdrant_storage
 docker-compose up
 ```
 
-### Erro de permissão
+### Permission error
 ```bash
-# No Linux, pode ser necessário ajustar permissões
+# On Linux, you may need to adjust permissions
 sudo chown -R $USER:$USER .
 ```
 
-## Variáveis de Ambiente
+## Environment Variables
 
-Todas as variáveis estão no `.env`:
+All variables are in `.env`:
 
-- `OPENAI_API_KEY`: Sua chave da OpenAI (obrigatório)
-- `DJANGO_SECRET_KEY`: Chave secreta do Django
-- `DEBUG`: True para desenvolvimento, False para produção
-- `QDRANT_COLLECTION`: Nome da collection no Qdrant
-- `OPENAI_EMBEDDING_MODEL`: Modelo de embedding (text-embedding-3-large)
+- `OPENAI_API_KEY`: Your OpenAI key (required)
+- `DJANGO_SECRET_KEY`: Django secret key
+- `DEBUG`: True for development, False for production
+- `QDRANT_COLLECTION`: Collection name in Qdrant
+- `OPENAI_EMBEDDING_MODEL`: Embedding model (text-embedding-3-large)
 
-## Produção
+## Production
 
-Para produção, faça as seguintes alterações:
+For production, make the following changes:
 
-1. Altere `DEBUG=False` no `.env`
-2. Gere uma nova `DJANGO_SECRET_KEY` segura
-3. Configure variáveis de produção no `.env`
-4. Use um servidor de produção (gunicorn) ao invés do runserver
-5. Configure um banco de dados PostgreSQL
-6. Configure um servidor web reverso (nginx)
+1. Change `DEBUG=False` in `.env`
+2. Generate a secure new `DJANGO_SECRET_KEY`
+3. Configure production variables in `.env`
+4. Use a production server (gunicorn) instead of runserver
+5. Configure a PostgreSQL database
+6. Configure a reverse proxy web server (nginx)
 
-## Arquitetura
+## Architecture
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
@@ -230,16 +230,40 @@ Para produção, faça as seguintes alterações:
 
 ## Volumes
 
-O Docker Compose cria os seguintes volumes:
+Docker Compose creates the following volumes:
 
-- `qdrant_storage`: Armazena dados do Qdrant
-- `django_static`: Arquivos estáticos do Django
-- `django_media`: Uploads de arquivos
+- `qdrant_storage`: Stores Qdrant data
+- `django_static`: Django static files
+- `django_media`: File uploads
 
-Para backup:
+For backup:
 
 ```bash
 docker run --rm -v contexta_qdrant_storage:/data -v $(pwd):/backup \
   alpine tar czf /backup/qdrant_backup.tar.gz /data
 ```
 
+## Makefile Commands
+
+For convenience, you can use the Makefile:
+
+```bash
+# Start all services
+make up
+
+# Stop all services
+make down
+
+# View logs
+make logs
+
+# Rebuild and restart
+make restart
+
+# Clean everything (remove volumes)
+make clean
+```
+
+---
+
+**For more detailed information, see the main [README.md](../README.md)**
