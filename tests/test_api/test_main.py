@@ -22,10 +22,12 @@ class TestAPIEndpoints:
         data = response.json()
         assert "message" in data or "version" in data
     
-    @patch('api.main.client')
-    def test_health_endpoint(self, mock_qdrant_client):
+    @patch('ingest.vectorstore.qdrant._get_client')
+    def test_health_endpoint(self, mock_get_client):
         """Test health check endpoint."""
+        mock_qdrant_client = Mock()
         mock_qdrant_client.get_collections.return_value = Mock(collections=[])
+        mock_get_client.return_value = mock_qdrant_client
         
         response = client.get("/health")
         
@@ -33,16 +35,16 @@ class TestAPIEndpoints:
         data = response.json()
         assert "status" in data
     
-    @patch('api.main.llm')
-    @patch('api.main.reranker')
+    @patch('api.main._get_llm')
+    @patch('api.main._get_reranker')
     @patch('ingest.vectorstore.qdrant.search')
     @patch('ingest.embeddings.openai.embed_texts')
     def test_query_endpoint(
         self,
         mock_embed,
         mock_search,
-        mock_reranker,
-        mock_llm
+        mock_get_reranker,
+        mock_get_llm
     ):
         """Test query endpoint."""
         # Setup mocks
@@ -57,8 +59,14 @@ class TestAPIEndpoints:
                 "payload": {}
             }
         ]
+        
+        mock_reranker = Mock()
         mock_reranker.rerank.return_value = mock_search.return_value
+        mock_get_reranker.return_value = mock_reranker
+        
+        mock_llm = Mock()
         mock_llm.generate.return_value = "This is a test answer"
+        mock_get_llm.return_value = mock_llm
         
         # Make request
         response = client.post(
