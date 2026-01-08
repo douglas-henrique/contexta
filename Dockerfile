@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir \
     openai>=1.0.0 \
     qdrant-client>=1.7.0 \
     djangorestframework>=3.15.0 \
+    djangorestframework-simplejwt>=5.3.1 \
+    django-cors-headers>=4.6.0 \
     httpx>=0.27.0 \
     python-docx>=1.1.0
 
