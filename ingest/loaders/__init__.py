@@ -86,4 +86,3 @@ def load_document(file_path: str, file_type: Optional[str] = None) -> str:
         raise NotImplementedError("DOCX loading not yet implemented")
     else:
         raise ValueError(f"Unsupported file type: {file_type}")
-

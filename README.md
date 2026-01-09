@@ -1,3 +1,5 @@
+![Contexta](contexta.png)
+
 # Contexta
 
 Production-grade RAG (Retrieval-Augmented Generation) SaaS application.
