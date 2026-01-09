@@ -1,7 +1,11 @@
 import logging
+import socket
 import time
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse
+
+import httpx
 
 from ingest.chunking.semantic import semantic_chunk
 from ingest.embeddings.openai import embed_texts
@@ -168,10 +172,6 @@ def _send_callback_with_retry(callback_url: str, payload: dict, document_id: int
         document_id: Document ID for logging
         max_retries: Maximum number of retry attempts
     """
-    import httpx
-    import socket
-    from urllib.parse import urlparse
-
     logger.info(f"Attempting to send callback for document {document_id} to {callback_url}")
 
     # Parse URL to get hostname
