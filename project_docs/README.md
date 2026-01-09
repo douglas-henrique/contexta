@@ -1,5 +1,9 @@
 # 📚 Contexta Project Documentation
 
+<div align="center">
+  <img src="../contexta.png" alt="Contexta Logo" width="200">
+</div>
+
 Welcome to the complete documentation for Contexta, a professional-grade RAG (Retrieval-Augmented Generation) SaaS application.
 
 ## 📖 Documentation Index
