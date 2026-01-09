@@ -161,7 +161,7 @@ def _send_failed_callback(callback_url: Optional[str], document_id: int):
 def _send_callback_with_retry(callback_url: str, payload: dict, document_id: int, max_retries: int = 3):
     """
     Send callback with retry logic.
-    
+
     Args:
         callback_url: URL to send callback to
         payload: JSON payload to send
@@ -174,10 +174,9 @@ def _send_callback_with_retry(callback_url: str, payload: dict, document_id: int
 
     logger.info(f"Attempting to send callback for document {document_id} to {callback_url}")
 
-    # Parse URL to get hostname and port
+    # Parse URL to get hostname
     parsed = urlparse(callback_url)
     hostname = parsed.hostname
-    port = parsed.port or (80 if parsed.scheme == "http" else 443)
 
     # Test DNS resolution and connectivity
     try:

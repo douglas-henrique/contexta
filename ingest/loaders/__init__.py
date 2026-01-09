@@ -81,9 +81,9 @@ def load_document(file_path: str, file_type: Optional[str] = None) -> str:
                     return f.read()
             except UnicodeDecodeError:
                 continue
-
         raise ValueError(f"Could not decode file: {file_path}")
     elif file_type == "docx":
         raise NotImplementedError("DOCX loading not yet implemented")
     else:
         raise ValueError(f"Unsupported file type: {file_type}")
+

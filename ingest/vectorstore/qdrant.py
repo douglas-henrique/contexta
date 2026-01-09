@@ -140,7 +140,7 @@ def search(
 
     try:
         client = _get_client()
-        
+
         # Use query_points - pass vector directly or use NamedVector
         # For qdrant-client 1.7.0+, query can be a list of floats directly
         query_result = client.query_points(
